@@ -24,3 +24,8 @@
 - Initialized `shadcn/ui` primitives within the Next.js template to provide a robust starting library.
 - Updated `src/generator/index.js` to dynamically copy the Next.js template to a temp folder and inject the generated React code directly into `page.tsx` during the Healing Loop.
 - Migrated core database logic in `src/discovery/db.js` and `src/deployer/index.js` to support PostgreSQL via the `pg` package. The system now dynamically routes database connections to a remote PostgreSQL instance if `DATABASE_URL` is detected, while retaining the safe local SQLite fallback for testing.
+
+## [0.0.4] - Repository Synchronization & Architecture Refinement
+### Changed
+- Executed Dual-Direction Intelligent Merge Engine to sync active feature branches into `main`.
+- Cleaned up `.gitignore` to explicitly track `.db` files as mandated by Executive Protocol directives.
