@@ -1,15 +1,10 @@
 # Session Handoff Summary
 
-- **Objective Completed**: Executed the `EXECUTIVE PROTOCOL: REPOSITORY SYNCHRONIZATION & INTELLIGENT MERGE`.
-- **Merge Status**:
-  - Ran `git fetch --all --tags`.
-  - Updated all recursive submodules.
-  - Successfully ran a forward fast-forward merge of the `jules-autonomous-utility-factory` feature branch into `main`.
-- **Documentation & Cleanup**:
-  - Bumped version to `0.0.4` globally.
-  - Appended Submodule Map to `MEMORY.md`.
-  - Added new `0.0.4` entry to `CHANGELOG.md`.
-  - Updated `.gitignore` and explicitly tracked local `.db` states to align with the prompt's strict requirement to track databases.
+- **Objective Completed**: Established continuous automated pipeline execution and created the main project CLI logic.
+- **Implemented Updates**:
+  - `src/scheduler.js`: Wired the previously isolated components into a single overarching `runFactoryCycle` function. Included error boundary catching to ensure the daemon doesn't crash on a single app failure.
+  - `index.js`: The root execution script. Use `npm start` to run immediately, `npm start -- --dry-run` to run without deploying, or `npm start -- --cron` to leave it running as a 6-hour daemon loop.
+  - Dependencies: Installed `dotenv` for easy local testing and `node-cron` for the scheduler.
+- **Testing**: CLI parameters and E2E loops via `npm start` tested successfully. Local unit tests remain green.
 - **Next Steps**:
-  - Main is now up-to-date and tracks all functional mocked generation/deployment logic.
-  - Future sessions should prioritize wiring up the remaining API keys (Vercel, Gemini) in a production environment and testing actual live URL routing.
+  - The pipeline is fully functional and scheduled. The next task is to provide visibility into the system by building a Next.js `dashboard` application in a dedicated directory. It should serve a UI that connects to the `.db` / Postgres databases to visualize discovered apps, deployment URLs, and runtime statistics.

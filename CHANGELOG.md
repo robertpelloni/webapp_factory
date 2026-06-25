@@ -29,3 +29,9 @@
 ### Changed
 - Executed Dual-Direction Intelligent Merge Engine to sync active feature branches into `main`.
 - Cleaned up `.gitignore` to explicitly track `.db` files as mandated by Executive Protocol directives.
+
+## [0.0.5] - Orchestration Scheduler & CLI
+### Added
+- Created `src/scheduler.js` to string together the entire pipeline sequentially (Discovery -> LLM Code Gen -> Heal Loop -> Vercel Deploy -> SEO Patch).
+- Implemented `node-cron` to execute the overarching loop on a 6-hour interval.
+- Created `index.js` as the main project CLI entry point, allowing users to start the orchestration cycle immediately or boot it as a background cron daemon. Added a `--dry-run` flag for safe debugging.

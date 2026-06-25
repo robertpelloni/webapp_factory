@@ -5,3 +5,5 @@
 - [x] Add `shadcn/ui` and `vercel/platforms` as submodules.
 - [x] Add `shadcn/ui` as a standard component library for generated applications.
 - [x] Integrate a real database (PostgreSQL/Supabase) to replace local SQLite when deploying the orchestration server to production.
+- [x] Initialize a scheduler/cron mechanism to continuously run the pipeline.
+- [ ] Build a frontend dashboard to visualize the local SQLite DB data and monitor running pipelines.

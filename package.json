@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
   },
   "homepage": "https://github.com/robertpelloni/webapp_factory#readme",
   "dependencies": {
+    "dotenv": "^17.4.2",
+    "node-cron": "^4.5.0",
     "pg": "^8.22.0",
     "playwright": "^1.61.1",
     "sqlite3": "^6.0.1"
