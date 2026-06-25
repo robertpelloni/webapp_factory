@@ -35,3 +35,9 @@
 - Created `src/scheduler.js` to string together the entire pipeline sequentially (Discovery -> LLM Code Gen -> Heal Loop -> Vercel Deploy -> SEO Patch).
 - Implemented `node-cron` to execute the overarching loop on a 6-hour interval.
 - Created `index.js` as the main project CLI entry point, allowing users to start the orchestration cycle immediately or boot it as a background cron daemon. Added a `--dry-run` flag for safe debugging.
+
+## [0.0.6] - Frontend Dashboard UI
+### Added
+- Created `src/dashboard` containing a fresh Next.js application to serve as the orchestrator's monitoring GUI.
+- Added API endpoints in the dashboard (`/api/apps` and `/api/routes`) that dynamically hook into the root PostgreSQL or local SQLite state databases.
+- Built a responsive UI using `shadcn/ui` Card and Table components to visualize the pipeline's progress, displaying discovered apps and actively deployed project URLs.
