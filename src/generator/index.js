@@ -70,13 +70,14 @@ async function generateCode(spec) {
     Requirements:
     - Return ONLY valid React code, no markdown wrapping, no explanations.
     - Use Tailwind CSS for styling.
+    - Assume shadcn/ui components are available in @/components/ui/
   `;
 
   const llmResponse = await callGemini(prompt);
 
   if (llmResponse) {
       console.log(`[Generator] Successfully generated code via Gemini for ${spec.app_name}`);
-      return llmResponse.replace(/```jsx?/g, '').replace(/```/g, '').trim();
+      return llmResponse.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
   }
 
   // Fallback Mock Code Generator
@@ -94,20 +95,45 @@ export default function App() {
   `;
 }
 
+// Helper to copy the template directory recursively
+function copyDirSync(src, dest) {
+    fs.mkdirSync(dest, { recursive: true });
+    let entries = fs.readdirSync(src, { withFileTypes: true });
+
+    for (let entry of entries) {
+        let srcPath = path.join(src, entry.name);
+        let destPath = path.join(dest, entry.name);
+
+        // Skip node_modules and .next for speed during copy
+        if (entry.name === 'node_modules' || entry.name === '.next') continue;
+
+        entry.isDirectory() ?
+            copyDirSync(srcPath, destPath) :
+            fs.copyFileSync(srcPath, destPath);
+    }
+}
+
 // The Healing Loop
 async function runHealingLoop(code, maxAttempts = 3) {
   let attempt = 0;
   let currentCode = code;
 
+  const templateDir = path.resolve(__dirname, 'template');
   const tempDir = path.resolve(__dirname, 'temp_build');
 
+  // Make sure to clean out temp_build if it exists to avoid conflicts from previous runs
   if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir);
+      console.log('[Healing Loop] Copying Next.js template...');
+      copyDirSync(templateDir, tempDir);
   }
 
   while (attempt < maxAttempts) {
     attempt++;
-    const filePath = path.resolve(tempDir, 'App.js');
+    // Inject the generated code into the app's entry point
+    const filePath = path.resolve(tempDir, 'src/app/page.js');
+
+    // Ensure parent directories exist
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, currentCode);
 
     try {
@@ -116,7 +142,7 @@ async function runHealingLoop(code, maxAttempts = 3) {
         throw new Error("Syntax error mock detected");
       }
 
-      // If we are actually compiling, we would run:
+      // If we are actually compiling (and have dependencies installed in tempDir), we would run:
       // execSync('npm run build', { cwd: tempDir, stdio: 'pipe' });
 
       return { success: true, code: currentCode, attempts: attempt };
@@ -128,7 +154,7 @@ async function runHealingLoop(code, maxAttempts = 3) {
 
         const errorMsg = error.message || error.toString();
         const patchPrompt = `
-          The following React code failed to build with error: ${errorMsg}
+          The following Next.js React code failed to build with error: ${errorMsg}
           Fix the code and return the entire corrected file. Return ONLY valid code.
           Code:
           ${currentCode}
@@ -137,7 +163,7 @@ async function runHealingLoop(code, maxAttempts = 3) {
         const llmPatch = await callGemini(patchPrompt);
 
         if (llmPatch) {
-             currentCode = llmPatch.replace(/```jsx?/g, '').replace(/```/g, '').trim();
+             currentCode = llmPatch.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
         } else {
              // Mock patch
              currentCode = currentCode.replace("SYNTAX_ERROR", "/* fixed */");

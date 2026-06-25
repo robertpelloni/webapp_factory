@@ -17,3 +17,10 @@
 - Stabilized testing environments to use graceful mock fallback logic when API tokens (`GEMINI_API_KEY`, `VERCEL_API_TOKEN`) are not present in the environment variables.
 ### Added Submodules
 - Initialized required submodules: `scrapingant`, `vercel/platforms`, and `shadcn-ui` into the `submodules/` directory to serve as reference architectures for future iterations.
+
+## [0.0.3] - Template and Database Upgrades
+### Added
+- Created a base Next.js template in `src/generator/template` to serve as the boilerplate for all LLM-generated code.
+- Initialized `shadcn/ui` primitives within the Next.js template to provide a robust starting library.
+- Updated `src/generator/index.js` to dynamically copy the Next.js template to a temp folder and inject the generated React code directly into `page.tsx` during the Healing Loop.
+- Migrated core database logic in `src/discovery/db.js` and `src/deployer/index.js` to support PostgreSQL via the `pg` package. The system now dynamically routes database connections to a remote PostgreSQL instance if `DATABASE_URL` is detected, while retaining the safe local SQLite fallback for testing.
