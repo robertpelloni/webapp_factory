@@ -54,3 +54,8 @@
 - Added a root `Dockerfile` using `node:20-bullseye-slim`, installing necessary Playwright OS dependencies, and building the dashboard UI.
 - Added a `docker-compose.yml` file configuring environment variable injection, port exposure (3000), and persistent local database mapping.
 - Added `start-container.sh` to simultaneously launch the dashboard and the `npm start -- --cron` orchestrator daemon inside the container.
+
+## [0.0.9] - Live RSS Discovery
+### Added
+- Upgraded `src/discovery/scraper.js` to target and parse Apple's live iTunes Top Free Utilities RSS feed using Playwright.
+- Validated DOM extraction logic to natively parse `title`, `summary`, and `category` from the returned XML payload.

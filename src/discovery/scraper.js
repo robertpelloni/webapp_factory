@@ -1,21 +1,18 @@
-const logger = require('../logger');
 const { chromium } = require('playwright');
+const logger = require('../logger');
 
 /**
  * Scrapes trending apps from a given mock/real URL.
- * Designed to target utilities and single-purpose tools.
+ * Designed to target utilities and single-purpose tools via real RSS endpoints.
  */
 async function scrapeTrendingApps() {
-  // In a real environment, this might be an App Store RSS feed or web view
-  const targetUrl = 'https://example.com/trending-utilities-mock';
+  // Targeting Apple's public iTunes RSS feed for Top Free iOS Apps in the "Utilities" category (category 6002)
+  const targetUrl = 'https://itunes.apple.com/us/rss/topfreeapplications/limit=10/genre=6002/xml';
 
   logger.info(`[Scraper] Launching headless browser to scrape ${targetUrl}`);
 
-  // We use try/catch to ensure browser closes even on failure
   let browser;
   try {
-    // For testing and sandbox safety, we mock the playwright response
-    // instead of actually launching if we're in a test environment
     if (process.env.NODE_ENV === 'test') {
        return [
          { name: "Complex Photoshop Clone", description: "A massive photo editor with cloud accounts", category: "Graphics" },
@@ -27,14 +24,25 @@ async function scrapeTrendingApps() {
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
 
-    await page.goto('https://example.com');
+    await page.goto(targetUrl);
 
-    const apps = [
-      { name: "Live Network Scanner", description: "A massive, complex network mapping tool.", category: "Utilities" },
-      { name: "JSON Formatter", description: "Format and validate JSON strings in the browser.", category: "Developer Tools" }
-    ];
+    // Evaluate the XML inside the browser context
+    const apps = await page.evaluate(() => {
+      const entries = Array.from(document.querySelectorAll('entry'));
+      return entries.map(entry => {
+        const titleEl = entry.querySelector('title');
+        const summaryEl = entry.querySelector('summary');
+        const categoryEl = entry.querySelector('category');
 
-    logger.info(`[Scraper] Successfully extracted ${apps.length} apps.`);
+        return {
+          name: titleEl ? titleEl.textContent : 'Unknown Utility',
+          description: summaryEl ? summaryEl.textContent : 'No description provided.',
+          category: categoryEl ? categoryEl.getAttribute('term') : 'Utilities'
+        };
+      });
+    });
+
+    logger.info(`[Scraper] Successfully extracted ${apps.length} apps from RSS.`);
     return apps;
 
   } catch (error) {
