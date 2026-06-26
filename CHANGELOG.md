@@ -48,3 +48,9 @@
 - Replaced all legacy `console.log` instances with standardized `logger.info` outputs.
 - Established persistent rotating file logs (`factory.log`, `error.log`).
 - Upgraded the Next.js `src/dashboard` to parse and tail the live `factory.log` file directly on the dashboard GUI.
+
+## [0.0.8] - Dockerization and Deployment Configuration
+### Added
+- Added a root `Dockerfile` using `node:20-bullseye-slim`, installing necessary Playwright OS dependencies, and building the dashboard UI.
+- Added a `docker-compose.yml` file configuring environment variable injection, port exposure (3000), and persistent local database mapping.
+- Added `start-container.sh` to simultaneously launch the dashboard and the `npm start -- --cron` orchestrator daemon inside the container.

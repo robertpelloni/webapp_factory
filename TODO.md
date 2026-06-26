@@ -8,3 +8,4 @@
 - [x] Initialize a scheduler/cron mechanism to continuously run the pipeline.
 - [x] Build a frontend dashboard to visualize the local SQLite DB data and monitor running pipelines.
 - [x] Implement robust error tracking and logging via Sentry or Winston for the background daemon.
+- [x] Containerize the orchestrator and dashboard via Docker.
