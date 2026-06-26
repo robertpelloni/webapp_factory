@@ -42,7 +42,7 @@ async function runFactoryCycle(isDryRun = false) {
          continue;
       }
 
-      const deployResult = await deployApp(app.name, healingResult.code);
+      const deployResult = await deployApp(app.name, healingResult.code, healingResult.tempDir);
 
       const meta = generateMetadata(app.name, app.category || 'Utilities');
       logger.info(`[Factory] Generated Meta Tags:\n${meta}`);

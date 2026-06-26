@@ -89,7 +89,7 @@ function getRoute(slug) {
     });
 }
 
-async function deployApp(appName, code) {
+async function deployApp(appName, code, tempDir = null) {
   await initDeployDb();
 
   const slug = appName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -97,7 +97,7 @@ async function deployApp(appName, code) {
 
   const token = process.env.VERCEL_API_TOKEN || 'mock_token';
   const project = await createVercelProject(slug, token);
-  const deployedUrl = await deployToVercel(project.projectId, code, token);
+  const deployedUrl = await deployToVercel(project.projectId, tempDir, token);
 
   logger.info(`[Deployer] Vercel returned deployment URL: ${deployedUrl}`);
 

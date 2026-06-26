@@ -1,9 +1,8 @@
-const logger = require('../logger');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const logger = require('../logger');
 
-// Helper to call Gemini API if key is present
 async function callGemini(prompt) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
@@ -45,7 +44,6 @@ async function generateSpec(appData) {
 
   if (llmResponse) {
     try {
-      // Strip markdown code block formatting if present
       const cleanJson = llmResponse.replace(/```json/g, '').replace(/```/g, '').trim();
       logger.info(`[Generator] Successfully generated spec via Gemini for ${appData.name}`);
       return JSON.parse(cleanJson);
@@ -54,7 +52,6 @@ async function generateSpec(appData) {
     }
   }
 
-  // Fallback Mock Spec Writer
   return {
     app_name: appData.name,
     framework: "Next.js / Tailwind CSS",
@@ -81,7 +78,6 @@ async function generateCode(spec) {
       return llmResponse.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
   }
 
-  // Fallback Mock Code Generator
   return `
 import React from 'react';
 
@@ -96,7 +92,6 @@ export default function App() {
   `;
 }
 
-// Helper to copy the template directory recursively
 function copyDirSync(src, dest) {
     fs.mkdirSync(dest, { recursive: true });
     let entries = fs.readdirSync(src, { withFileTypes: true });
@@ -105,7 +100,6 @@ function copyDirSync(src, dest) {
         let srcPath = path.join(src, entry.name);
         let destPath = path.join(dest, entry.name);
 
-        // Skip node_modules and .next for speed during copy
         if (entry.name === 'node_modules' || entry.name === '.next') continue;
 
         entry.isDirectory() ?
@@ -114,7 +108,6 @@ function copyDirSync(src, dest) {
     }
 }
 
-// The Healing Loop
 async function runHealingLoop(code, maxAttempts = 3) {
   let attempt = 0;
   let currentCode = code;
@@ -122,40 +115,52 @@ async function runHealingLoop(code, maxAttempts = 3) {
   const templateDir = path.resolve(__dirname, 'template');
   const tempDir = path.resolve(__dirname, 'temp_build');
 
-  // Make sure to clean out temp_build if it exists to avoid conflicts from previous runs
   if (!fs.existsSync(tempDir)) {
       logger.info('[Healing Loop] Copying Next.js template...');
       copyDirSync(templateDir, tempDir);
+
+      // Perform a one-time npm install in the temp directory if not running in pure mock mode
+      if (process.env.GEMINI_API_KEY) {
+          logger.info('[Healing Loop] Installing template dependencies...');
+          execSync('npm install', { cwd: tempDir, stdio: 'ignore' });
+      }
   }
 
   while (attempt < maxAttempts) {
     attempt++;
-    // Inject the generated code into the app's entry point
     const filePath = path.resolve(tempDir, 'src/app/page.js');
 
-    // Ensure parent directories exist
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, currentCode);
 
     try {
-      // We simulate a build command. For mocking, if code contains "ERROR", it fails.
       if (currentCode.includes("SYNTAX_ERROR")) {
         throw new Error("Syntax error mock detected");
       }
 
-      // If we are actually compiling (and have dependencies installed in tempDir), we would run:
-      // execSync('npm run build', { cwd: tempDir, stdio: 'pipe' });
+      // Actual build validation
+      if (process.env.GEMINI_API_KEY) {
+          logger.info(`[Healing Loop] Attempt ${attempt}: Running actual Next.js build validation...`);
+          execSync('npm run build', { cwd: tempDir, stdio: 'pipe' });
+          logger.info(`[Healing Loop] Build successful!`);
+      }
 
-      return { success: true, code: currentCode, attempts: attempt };
+      return { success: true, code: currentCode, attempts: attempt, tempDir };
     } catch (error) {
-      logger.info(`[Healing Loop] Attempt ${attempt} failed:`, error.message);
+      // Capture the stderr from the build command if it failed
+      let errorMsg = error.message;
+      if (error.stderr) {
+         errorMsg = error.stderr.toString();
+      }
+
+      logger.error(`[Healing Loop] Attempt ${attempt} failed: \n${errorMsg.substring(0, 500)}...`);
 
       if (attempt < maxAttempts) {
-        logger.info(`[Healing Loop] Patching code...`);
+        logger.info(`[Healing Loop] Requesting patch from LLM...`);
 
-        const errorMsg = error.message || error.toString();
         const patchPrompt = `
-          The following Next.js React code failed to build with error: ${errorMsg}
+          The following Next.js React code failed to build with error:
+          ${errorMsg}
           Fix the code and return the entire corrected file. Return ONLY valid code.
           Code:
           ${currentCode}
@@ -166,14 +171,13 @@ async function runHealingLoop(code, maxAttempts = 3) {
         if (llmPatch) {
              currentCode = llmPatch.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
         } else {
-             // Mock patch
              currentCode = currentCode.replace("SYNTAX_ERROR", "/* fixed */");
         }
       }
     }
   }
 
-  return { success: false, code: currentCode, attempts: attempt };
+  return { success: false, code: currentCode, attempts: attempt, tempDir };
 }
 
 module.exports = {

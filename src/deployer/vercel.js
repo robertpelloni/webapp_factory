@@ -1,8 +1,6 @@
+const fs = require('fs');
+const path = require('path');
 const logger = require('../logger');
-/**
- * Vercel Deployment Architecture Shell
- * Handles API calls to Vercel for dynamic project creation and deployment.
- */
 
 async function createVercelProject(slug, token) {
   if (token === 'mock_token' || !token) {
@@ -33,14 +31,42 @@ async function createVercelProject(slug, token) {
   }
 }
 
-async function deployToVercel(projectId, filesContent, token) {
-  if (token === 'mock_token' || !token) {
+// Recursively reads a directory to build the file array Vercel expects
+function getFilesForVercel(dir, baseDir = dir) {
+  let results = [];
+  const list = fs.readdirSync(dir);
+
+  for (let file of list) {
+    file = path.resolve(dir, file);
+    const stat = fs.statSync(file);
+
+    if (stat && stat.isDirectory()) {
+      // Skip heavy/ignored folders
+      if (!file.includes('node_modules') && !file.includes('.next') && !file.includes('.git')) {
+         results = results.concat(getFilesForVercel(file, baseDir));
+      }
+    } else {
+      const relativePath = path.relative(baseDir, file);
+      // Read file as base64 string
+      const data = fs.readFileSync(file, 'base64');
+      results.push({ file: relativePath, data, encoding: 'base64' });
+    }
+  }
+  return results;
+}
+
+async function deployToVercel(projectId, tempWorkspaceDir, token) {
+  if (token === 'mock_token' || !token || !tempWorkspaceDir) {
      logger.info(`[Vercel Mock] Deploying code to project: ${projectId}`);
      return `${projectId}.vercel.app`;
   }
 
-  logger.info(`[Vercel API] Deploying code to project: ${projectId}`);
+  logger.info(`[Vercel API] Packaging and deploying full workspace to: ${projectId}`);
+
   try {
+    // We now package the ENTIRE generated template workspace, not just the single file
+    const filesArray = getFilesForVercel(tempWorkspaceDir);
+
     const response = await fetch('https://api.vercel.com/v13/deployments', {
       method: 'POST',
       headers: {
@@ -49,9 +75,7 @@ async function deployToVercel(projectId, filesContent, token) {
       },
       body: JSON.stringify({
         name: projectId,
-        files: [
-          { file: 'pages/index.js', data: filesContent }
-        ],
+        files: filesArray,
         projectSettings: { framework: 'nextjs' }
       })
     });
