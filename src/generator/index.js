@@ -1,3 +1,4 @@
+const logger = require('../logger');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -16,7 +17,7 @@ async function callGemini(prompt) {
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
   } catch (error) {
-    console.error('[Gemini API] Error calling Gemini:', error);
+    logger.error('[Gemini API] Error calling Gemini:', error);
     return null;
   }
 }
@@ -46,10 +47,10 @@ async function generateSpec(appData) {
     try {
       // Strip markdown code block formatting if present
       const cleanJson = llmResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-      console.log(`[Generator] Successfully generated spec via Gemini for ${appData.name}`);
+      logger.info(`[Generator] Successfully generated spec via Gemini for ${appData.name}`);
       return JSON.parse(cleanJson);
     } catch(e) {
-        console.error('[Generator] Failed to parse Gemini output, falling back to mock.');
+        logger.error('[Generator] Failed to parse Gemini output, falling back to mock.');
     }
   }
 
@@ -76,7 +77,7 @@ async function generateCode(spec) {
   const llmResponse = await callGemini(prompt);
 
   if (llmResponse) {
-      console.log(`[Generator] Successfully generated code via Gemini for ${spec.app_name}`);
+      logger.info(`[Generator] Successfully generated code via Gemini for ${spec.app_name}`);
       return llmResponse.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
   }
 
@@ -123,7 +124,7 @@ async function runHealingLoop(code, maxAttempts = 3) {
 
   // Make sure to clean out temp_build if it exists to avoid conflicts from previous runs
   if (!fs.existsSync(tempDir)) {
-      console.log('[Healing Loop] Copying Next.js template...');
+      logger.info('[Healing Loop] Copying Next.js template...');
       copyDirSync(templateDir, tempDir);
   }
 
@@ -147,10 +148,10 @@ async function runHealingLoop(code, maxAttempts = 3) {
 
       return { success: true, code: currentCode, attempts: attempt };
     } catch (error) {
-      console.log(`[Healing Loop] Attempt ${attempt} failed:`, error.message);
+      logger.info(`[Healing Loop] Attempt ${attempt} failed:`, error.message);
 
       if (attempt < maxAttempts) {
-        console.log(`[Healing Loop] Patching code...`);
+        logger.info(`[Healing Loop] Patching code...`);
 
         const errorMsg = error.message || error.toString();
         const patchPrompt = `

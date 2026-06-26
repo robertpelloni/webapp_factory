@@ -41,3 +41,10 @@
 - Created `src/dashboard` containing a fresh Next.js application to serve as the orchestrator's monitoring GUI.
 - Added API endpoints in the dashboard (`/api/apps` and `/api/routes`) that dynamically hook into the root PostgreSQL or local SQLite state databases.
 - Built a responsive UI using `shadcn/ui` Card and Table components to visualize the pipeline's progress, displaying discovered apps and actively deployed project URLs.
+
+## [0.0.7] - Robust Logging Architecture
+### Added
+- Integrated the `winston` package as the global application logger (`src/logger.js`).
+- Replaced all legacy `console.log` instances with standardized `logger.info` outputs.
+- Established persistent rotating file logs (`factory.log`, `error.log`).
+- Upgraded the Next.js `src/dashboard` to parse and tail the live `factory.log` file directly on the dashboard GUI.

@@ -6,16 +6,35 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 export default function Dashboard() {
   const [apps, setApps] = useState([]);
   const [routes, setRoutes] = useState([]);
+  const [logs, setLogs] = useState('');
 
   useEffect(() => {
     fetch('/api/apps').then(res => res.json()).then(data => setApps(Array.isArray(data) ? data : []));
     fetch('/api/routes').then(res => res.json()).then(data => setRoutes(Array.isArray(data) ? data : []));
+
+    // Poll logs every 5 seconds
+    const fetchLogs = () => fetch('/api/logs').then(res => res.text()).then(data => setLogs(data));
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <h1 className="text-4xl font-bold tracking-tight">WebApp Factory Dashboard</h1>
-      <p className="text-muted-foreground">Monitoring active pipelines, processed utilities, and dynamic deployments.</p>
+      <p className="text-muted-foreground">Monitoring active pipelines, processed utilities, dynamic deployments, and live daemon logs.</p>
+
+      {/* Logs Card */}
+      <Card className="w-full">
+        <CardHeader>
+           <CardTitle>Daemon Runtime Logs (Tail)</CardTitle>
+        </CardHeader>
+        <CardContent>
+           <pre className="bg-slate-950 text-green-400 p-4 rounded-md h-64 overflow-y-auto font-mono text-sm whitespace-pre-wrap break-words">
+              {logs || 'Loading logs...'}
+           </pre>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Apps Table */}

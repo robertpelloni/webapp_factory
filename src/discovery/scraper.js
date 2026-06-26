@@ -1,3 +1,4 @@
+const logger = require('../logger');
 const { chromium } = require('playwright');
 
 /**
@@ -8,7 +9,7 @@ async function scrapeTrendingApps() {
   // In a real environment, this might be an App Store RSS feed or web view
   const targetUrl = 'https://example.com/trending-utilities-mock';
 
-  console.log(`[Scraper] Launching headless browser to scrape ${targetUrl}`);
+  logger.info(`[Scraper] Launching headless browser to scrape ${targetUrl}`);
 
   // We use try/catch to ensure browser closes even on failure
   let browser;
@@ -33,11 +34,11 @@ async function scrapeTrendingApps() {
       { name: "JSON Formatter", description: "Format and validate JSON strings in the browser.", category: "Developer Tools" }
     ];
 
-    console.log(`[Scraper] Successfully extracted ${apps.length} apps.`);
+    logger.info(`[Scraper] Successfully extracted ${apps.length} apps.`);
     return apps;
 
   } catch (error) {
-    console.error(`[Scraper] Error during scraping: ${error.message}`);
+    logger.error(`[Scraper] Error during scraping: ${error.message}`);
     return [];
   } finally {
     if (browser) {

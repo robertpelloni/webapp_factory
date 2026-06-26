@@ -1,3 +1,4 @@
+const logger = require('../logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -34,13 +35,13 @@ function updateSitemap(subdomain) {
   }
 
   fs.writeFileSync(sitemapPath, sitemapContent);
-  console.log(`[SEO] Appended ${subdomain} to sitemap.`);
+  logger.info(`[SEO] Appended ${subdomain} to sitemap.`);
   return sitemapContent; // Return for testing
 }
 
 async function triggerIndexing(subdomain) {
   // Mock Google Search Console URL Submission API
-  console.log(`[SEO] Prompting immediate crawler indexing for https://${subdomain}`);
+  logger.info(`[SEO] Prompting immediate crawler indexing for https://${subdomain}`);
   return true;
 }
 

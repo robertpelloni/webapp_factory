@@ -1,3 +1,4 @@
+const logger = require('../logger');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { Pool } = require('pg');
@@ -98,10 +99,10 @@ async function deployApp(appName, code) {
   const project = await createVercelProject(slug, token);
   const deployedUrl = await deployToVercel(project.projectId, code, token);
 
-  console.log(`[Deployer] Vercel returned deployment URL: ${deployedUrl}`);
+  logger.info(`[Deployer] Vercel returned deployment URL: ${deployedUrl}`);
 
   await saveRoute(slug, subdomain);
-  console.log(`[Deployer] Successfully mapped ${appName} to ${subdomain}`);
+  logger.info(`[Deployer] Successfully mapped ${appName} to ${subdomain}`);
 
   return { slug, subdomain, deployedUrl };
 }

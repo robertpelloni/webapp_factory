@@ -47,4 +47,10 @@
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <url>
+    <loc>https://simple-percentage-calculator.utilityhub.com</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
