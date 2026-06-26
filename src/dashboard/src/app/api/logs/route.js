@@ -3,7 +3,7 @@ import path from 'path';
 
 export async function GET() {
   try {
-    const logPath = path.resolve(process.cwd(), '../factory.log');
+    const logPath = path.resolve(process.cwd(), '../../factory.log');
     if (!fs.existsSync(logPath)) {
         return new Response("No logs found.", { status: 200 });
     }
