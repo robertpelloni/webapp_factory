@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import sqlite3 from 'sqlite3';
 import { Pool } from 'pg';
 import path from 'path';

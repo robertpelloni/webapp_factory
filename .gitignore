@@ -3,3 +3,4 @@ node_modules/
 temp_build/
 factory.log
 error.log
+.env*
