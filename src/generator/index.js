@@ -63,7 +63,7 @@ async function generateSpec(appData) {
 
 async function generateCode(spec) {
   const prompt = `
-    Write a complete, single-file Next.js React component for the following spec:
+    Write a complete, single-file Next.js React component for the following spec, ensuring the layout is compact, responsive, and specifically designed to be embedded as an iframe widget (e.g. for Notion or personal websites):
     ${JSON.stringify(spec)}
     Requirements:
     - Return ONLY valid React code, no markdown wrapping, no explanations.
