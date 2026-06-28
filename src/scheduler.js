@@ -1,9 +1,9 @@
-const logger = require('./logger');
 const cron = require('node-cron');
 const { runDiscovery } = require('./discovery');
 const { generateSpec, generateCode, runHealingLoop } = require('./generator');
 const { deployApp } = require('./deployer');
-const { generateMetadata, updateSitemap } = require('./seo');
+const { generateMetadata, injectMetadataIntoLayout, updateSitemap } = require('./seo');
+const logger = require('./logger');
 
 async function runFactoryCycle(isDryRun = false) {
   logger.info(`\n=== Starting Factory Cycle [Dry Run: ${isDryRun}] ===\n`);
@@ -42,10 +42,11 @@ async function runFactoryCycle(isDryRun = false) {
          continue;
       }
 
-      const deployResult = await deployApp(app.name, healingResult.code, healingResult.tempDir);
-
+      // Inject SEO metadata natively into the Next.js layout before deployment
       const meta = generateMetadata(app.name, app.category || 'Utilities');
-      logger.info(`[Factory] Generated Meta Tags:\n${meta}`);
+      injectMetadataIntoLayout(healingResult.tempDir, meta);
+
+      const deployResult = await deployApp(app.name, healingResult.code, healingResult.tempDir);
 
       updateSitemap(deployResult.subdomain);
 
@@ -60,7 +61,6 @@ async function runFactoryCycle(isDryRun = false) {
 
 function startScheduler() {
   logger.info("[Scheduler] Initializing cron job: Running every 6 hours (0 */6 * * *)");
-  // Run every 6 hours
   cron.schedule('0 */6 * * *', () => {
     runFactoryCycle();
   });
