@@ -1,5 +1,6 @@
 const { initDb, isAppProcessed, markAppProcessed } = require('./db.js');
 const { scrapeTrendingApps } = require('./scraper.js');
+const { scrapeTrendingPrompts } = require('./prompts.js');
 const logger = require('../logger');
 
 // We reuse the callGemini pattern from generator, but implement it locally to avoid circular dependencies
@@ -48,6 +49,8 @@ async function runDiscovery() {
   await initDb();
 
   const apps = await scrapeAppStore();
+  const promptApps = await scrapeTrendingPrompts();
+  apps.push(...promptApps);
   const feasibleApps = [];
 
   for (const app of apps) {

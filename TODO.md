@@ -12,4 +12,4 @@
 - [x] Add a universal AdBanner component to the Next.js templates.
 - [x] Generate specialized Widgets for Notion embeds.
 - [x] Pivot to pure HTML/Vanilla JS generation.
-- [ ] Create a specific subset scraper for ChatGPT prompts.
+- [x] Create a specific subset scraper for ChatGPT prompts.
