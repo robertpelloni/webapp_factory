@@ -16,7 +16,7 @@ async function createVercelProject(slug, token) {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ name: slug, framework: "nextjs" })
+      body: JSON.stringify({ name: slug })
     });
 
     if (!response.ok) {
@@ -76,7 +76,7 @@ async function deployToVercel(projectId, tempWorkspaceDir, token) {
       body: JSON.stringify({
         name: projectId,
         files: filesArray,
-        projectSettings: { framework: 'nextjs' }
+        projectSettings: { framework: null }
       })
     });
 

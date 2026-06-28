@@ -7,30 +7,23 @@ function generateMetadata(appName, category) {
   const description = `Use our free online ${appName}. No download required, fast, and secure client-side execution.`;
 
   return `
-export const metadata = {
-  title: "${title}",
-  description: "${description}",
-  openGraph: {
-    title: "${title}",
-    description: "${description}"
-  }
-};
+    <title>${title}</title>
+    <meta name="description" content="${description}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${description}">
   `;
 }
 
 function injectMetadataIntoLayout(tempDir, metadataString) {
-    const layoutPath = path.resolve(tempDir, 'src/app/layout.js');
+    const layoutPath = path.resolve(tempDir, 'index.html');
     if (fs.existsSync(layoutPath)) {
         let layoutContent = fs.readFileSync(layoutPath, 'utf8');
 
-        // Remove existing simplistic metadata export if present
-        layoutContent = layoutContent.replace(/export const metadata = \{[^}]+\};/s, '');
-
-        // Append the new rich metadata block right before the RootLayout export
-        layoutContent = layoutContent.replace('export default function RootLayout', `${metadataString}\nexport default function RootLayout`);
+        // Replace existing simplistic title if present
+        layoutContent = layoutContent.replace(/<title>.*<\/title>/s, metadataString);
 
         fs.writeFileSync(layoutPath, layoutContent);
-        logger.info(`[SEO] Injected rich Next.js metadata into layout.`);
+        logger.info(`[SEO] Injected rich HTML metadata into index.html.`);
     }
 }
 

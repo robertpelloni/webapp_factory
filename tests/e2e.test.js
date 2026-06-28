@@ -18,18 +18,18 @@ describe('Autonomous Utility Factory E2E Mocking Suite', () => {
     // 2. Generator Spec - We updated generateSpec to be async when we added LLM!
     const spec = await generateSpec(targetApp);
     expect(spec.app_name).toBe('Simple Percentage Calculator');
-    expect(spec.framework).toContain('Next.js');
+    expect(spec.framework).toContain('HTML');
 
     // 3. Code Generation - We updated generateCode to be async when we added LLM!
     let code = await generateCode(spec);
     expect(code).toContain('Simple Percentage Calculator');
 
     // 4. Test Syntax Error Healing Loop logic (injecting bad code) - Now async
-    const badCode = code + '\n// SYNTAX_ERROR';
+    const badCode = code + '\n<!-- SYNTAX_ERROR -->';
     const healedResult = await runHealingLoop(badCode);
     expect(healedResult.success).toBe(true);
     expect(healedResult.attempts).toBe(2);
-    expect(healedResult.code).toContain('/* fixed */');
+    expect(healedResult.code).toContain('<!-- fixed -->');
 
     // 5. Deployer
     const finalCode = healedResult.code;
