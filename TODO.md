@@ -9,3 +9,4 @@
 - [x] Build a frontend dashboard to visualize the local SQLite DB data and monitor running pipelines.
 - [x] Implement robust error tracking and logging via Sentry or Winston for the background daemon.
 - [x] Containerize the orchestrator and dashboard via Docker.
+- [ ] Add a universal AdBanner component to the Next.js templates.
