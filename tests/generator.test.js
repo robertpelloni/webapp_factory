@@ -24,7 +24,7 @@ async function test() {
   }
 
   // Test healing loop - error case that gets fixed
-  const badCode = code + "\n<!-- SYNTAX_ERROR -->";
+  const badCode = code + "\n// SYNTAX_ERROR";
   const resultHealed = await runHealingLoop(badCode);
   if (!resultHealed.success || resultHealed.attempts !== 2) {
     console.error("Healing loop failed to heal bad code properly");

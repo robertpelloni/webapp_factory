@@ -23,19 +23,20 @@ async function callGemini(prompt) {
 
 async function generateSpec(appData) {
   const prompt = `
-    You are an expert software architect. Analyze the following trending application and create a highly rigid JSON specification for building a pure HTML/Tailwind/Vanilla JS web alternative.
+    You are an expert software architect. Analyze the following trending application and create a highly rigid JSON specification for building a client-side Next.js web alternative.
     Target App: ${appData.name} - ${appData.description}
     Requirements:
     - Must be a client-side utility (no backend databases).
-    - Use "HTML / Tailwind CSS / Vanilla JS".
+    - Use "Next.js / Tailwind CSS".
+    - Use "shadcn/ui" components where possible.
     Output ONLY valid JSON.
     Format:
     {
       "app_name": "WebAlternativeName",
-      "framework": "HTML / Tailwind CSS / Vanilla JS",
-      "components": ["List", "Of", "Sections"],
-      "state_management": "Vanilla JS DOM manipulation",
-      "libraries_allowed": ["canvas-confetti"]
+      "framework": "Next.js / Tailwind CSS",
+      "components": ["List", "Of", "Components"],
+      "state_management": "React Context or useState",
+      "libraries_allowed": ["lucide-react", "canvas-confetti"]
     }
   `;
 
@@ -53,64 +54,83 @@ async function generateSpec(appData) {
 
   return {
     app_name: appData.name,
-    framework: "HTML / Tailwind CSS / Vanilla JS",
+    framework: "Next.js / Tailwind CSS",
     components: ["Header", "MainTool", "Footer"],
-    state_management: "Vanilla JS DOM manipulation",
-    libraries_allowed: []
+    state_management: "React Context",
+    libraries_allowed: ["lucide-react"]
   };
 }
 
 async function generateCode(spec) {
   const prompt = `
-    Write a complete, single-file HTML document for the following spec, ensuring the layout is compact, responsive, and specifically designed to be embedded as an iframe widget (e.g. for Notion or personal websites):
+    Write a complete, single-file Next.js React component for the following spec:
     ${JSON.stringify(spec)}
     Requirements:
-    - Return ONLY valid HTML code, no markdown wrapping, no explanations.
+    - Return ONLY valid React code, no markdown wrapping, no explanations.
     - Use Tailwind CSS for styling.
-    - Load Tailwind CSS via CDN (e.g. <script src="https://cdn.tailwindcss.com"></script>)
-    - All JavaScript must be in a single <script> tag at the bottom of the body.
+    - Assume shadcn/ui components are available in @/components/ui/
   `;
 
   const llmResponse = await callGemini(prompt);
 
   if (llmResponse) {
-      logger.info(`[Generator] Successfully generated HTML code via Gemini for ${spec.app_name}`);
-      return llmResponse.replace(/```html?/g, '').replace(/```/g, '').trim();
+      logger.info(`[Generator] Successfully generated code via Gemini for ${spec.app_name}`);
+      return llmResponse.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
   }
 
   return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${spec.app_name}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <h1 class="text-2xl font-bold">${spec.app_name}</h1>
-        <p>Tool content goes here. (Mocked Vanilla JS version)</p>
+import React from 'react';
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <h1 className="text-2xl font-bold">${spec.app_name}</h1>
+      <p>Tool content goes here. (Mocked)</p>
     </div>
-</body>
-</html>
+  );
+}
   `;
 }
 
+function copyDirSync(src, dest) {
+    fs.mkdirSync(dest, { recursive: true });
+    let entries = fs.readdirSync(src, { withFileTypes: true });
+
+    for (let entry of entries) {
+        let srcPath = path.join(src, entry.name);
+        let destPath = path.join(dest, entry.name);
+
+        if (entry.name === 'node_modules' || entry.name === '.next') continue;
+
+        entry.isDirectory() ?
+            copyDirSync(srcPath, destPath) :
+            fs.copyFileSync(srcPath, destPath);
+    }
+}
 
 async function runHealingLoop(code, maxAttempts = 3) {
   let attempt = 0;
   let currentCode = code;
+
+  const templateDir = path.resolve(__dirname, 'template');
   const tempDir = path.resolve(__dirname, 'temp_build');
 
   if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
+      logger.info('[Healing Loop] Copying Next.js template...');
+      copyDirSync(templateDir, tempDir);
+
+      // Perform a one-time npm install in the temp directory if not running in pure mock mode
+      if (process.env.GEMINI_API_KEY) {
+          logger.info('[Healing Loop] Installing template dependencies...');
+          execSync('npm install', { cwd: tempDir, stdio: 'ignore' });
+      }
   }
 
   while (attempt < maxAttempts) {
     attempt++;
-    const filePath = path.resolve(tempDir, 'index.html');
+    const filePath = path.resolve(tempDir, 'src/app/page.js');
 
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, currentCode);
 
     try {
@@ -118,12 +138,20 @@ async function runHealingLoop(code, maxAttempts = 3) {
         throw new Error("Syntax error mock detected");
       }
 
-      // No actual npm run build for Vanilla JS, just file write validation
-      logger.info(`[Healing Loop] HTML file successfully validated without build errors.`);
+      // Actual build validation
+      if (process.env.GEMINI_API_KEY) {
+          logger.info(`[Healing Loop] Attempt ${attempt}: Running actual Next.js build validation...`);
+          execSync('npm run build', { cwd: tempDir, stdio: 'pipe' });
+          logger.info(`[Healing Loop] Build successful!`);
+      }
 
       return { success: true, code: currentCode, attempts: attempt, tempDir };
     } catch (error) {
+      // Capture the stderr from the build command if it failed
       let errorMsg = error.message;
+      if (error.stderr) {
+         errorMsg = error.stderr.toString();
+      }
 
       logger.error(`[Healing Loop] Attempt ${attempt} failed: \n${errorMsg.substring(0, 500)}...`);
 
@@ -131,9 +159,9 @@ async function runHealingLoop(code, maxAttempts = 3) {
         logger.info(`[Healing Loop] Requesting patch from LLM...`);
 
         const patchPrompt = `
-          The following HTML code failed validation with error:
+          The following Next.js React code failed to build with error:
           ${errorMsg}
-          Fix the code and return the entire corrected file. Return ONLY valid HTML code.
+          Fix the code and return the entire corrected file. Return ONLY valid code.
           Code:
           ${currentCode}
         `;
@@ -141,9 +169,9 @@ async function runHealingLoop(code, maxAttempts = 3) {
         const llmPatch = await callGemini(patchPrompt);
 
         if (llmPatch) {
-             currentCode = llmPatch.replace(/```html?/g, '').replace(/```/g, '').trim();
+             currentCode = llmPatch.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
         } else {
-             currentCode = currentCode.replace("SYNTAX_ERROR", "<!-- fixed -->");
+             currentCode = currentCode.replace("SYNTAX_ERROR", "/* fixed */");
         }
       }
     }

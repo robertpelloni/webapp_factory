@@ -9,7 +9,3 @@
 - [x] Build a frontend dashboard to visualize the local SQLite DB data and monitor running pipelines.
 - [x] Implement robust error tracking and logging via Sentry or Winston for the background daemon.
 - [x] Containerize the orchestrator and dashboard via Docker.
-- [x] Add a universal AdBanner component to the Next.js templates.
-- [x] Generate specialized Widgets for Notion embeds.
-- [x] Pivot to pure HTML/Vanilla JS generation.
-- [x] Create a specific subset scraper for ChatGPT prompts.
