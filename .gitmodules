@@ -1,0 +1,9 @@
+[submodule "submodules/scrapingant"]
+	path = submodules/scrapingant
+	url = https://github.com/ScrapingAnt/scrapingant-client-python.git
+[submodule "submodules/platforms"]
+	path = submodules/platforms
+	url = https://github.com/vercel/platforms.git
+[submodule "submodules/shadcn-ui"]
+	path = submodules/shadcn-ui
+	url = https://github.com/shadcn-ui/ui.git
