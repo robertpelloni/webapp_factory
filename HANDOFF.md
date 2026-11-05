@@ -14,10 +14,9 @@
   3. Created `src/tray.js` cross-platform server tray & process management controller:
      - Commands: `--status`, `--run`, `--dry-run`, `--start-all`, `--quit`, `--help`.
      - Gracefully terminates running servers on port 3000 and factory daemon processes.
-  4. Added scripts to `package.json`:
-     - `npm run tray`: Run the tray manager.
-     - `npm run start:all`: Launch dashboard and factory scheduler in background.
-     - `npm run stop`: Gracefully terminate running instances.
+  4. Executed live factory cycles:
+     - Ingested 6 real-world apps into `src/discovery/discovery.db` (total count: 7).
+     - Generated and deployed `unit-converter-pro.utilityhub.com` into `src/deployer/routes.db` (total count: 3) and `docs/widgets/unit-converter-pro.md`.
   5. Verified clean Next.js production build (`npm run build`) in `src/dashboard`.
   6. Verified complete Vitest test suite (`npm test`) with all 13 test files and 20 tests passing.
 

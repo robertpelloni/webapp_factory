@@ -1,7 +1,10 @@
 # CHANGELOG
 
-## [4.1.0] - 2026-11-04
+## [4.1.0] - 2026-11-05
 ### Added
+- Automated factory cycle execution via CLI / Tray Controller (`node src/tray.js --run`, `node src/tray.js --dry-run`).
+- Ingested 6 real-world utilities from App Store RSS into `discovery.db` (Google, Chrome, Phone Storage Cleaner, Edge, Apple Support, Verizon).
+- Generated and deployed new client-side widget `unit-converter-pro.utilityhub.com` into `routes.db` and sitemap.
 - Consolidated single-page monitoring dashboard UI in Next.js with high-value metric cards, real-time trigger controls, and informative tooltips.
 - New dashboard backend endpoints: `/api/pipeline/run` (instant factory cycle execution & dry run) and `/api/pipeline/status` (system uptime, process memory, and database entity counts).
 - Server tray & process management controller (`src/tray.js`) with support for `--status`, `--run`, `--dry-run`, `--start-all`, and `--quit`.
