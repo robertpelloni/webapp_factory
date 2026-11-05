@@ -1,5 +1,5 @@
 # IDEAS
-- Add WebSocket-based live streaming log updates in the Next.js dashboard as an alternative to HTTP polling.
-- Implement automated semantic tag generation for OpenGraph preview images per deployed utility.
-- Add an interactive web playground directly inside the dashboard to preview generated HTML/Tailwind widgets in an isolated sandbox iframe.
-- Build Electron or native OS tray wrappers on top of `src/tray.js` for desktop menu bar integration on macOS/Windows/Linux.
+- Pivot the generated code output from raw React/Next.js to pure HTML/Tailwind/Vanilla JS for even faster execution and near-zero build times.
+- Create a specific subset scraper that targets trending ChatGPT prompts and builds a micro-UI around the prompt automatically.
+- Generate specialized "Widgets" that users can embed in Notion or personal websites instead of full-page web apps.
+- Monetization idea: Inject a universal, unintrusive ad banner component across all generated micro-utilities to offset LLM API costs.
