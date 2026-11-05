@@ -1,10 +1,24 @@
 # Session Handoff Summary
 
-- **Objective Completed**: Finalized Phase 2 of the ROADMAP by connecting the discovery engine to live, real-world App Store data.
-- **Implemented Updates**:
-  - `src/discovery/scraper.js`: Removed the fallback static mock arrays and wired Playwright directly to `https://itunes.apple.com/us/rss/topfreeapplications/limit=10/genre=6002/xml`.
-  - Refined the `page.evaluate` DOM querying to successfully navigate standard XML RSS feeds.
-  - Bumped the overall version to `0.0.9` and updated `ROADMAP.md` and `CHANGELOG.md` to reflect Phase 2 completion.
-- **Testing**: Executed `node tests/scraper.test.js` under the `NODE_ENV=production` flag to bypass the sandbox block, confirming it successfully retrieves and parses the top 10 utilities currently ranking on the Apple App store.
-- **Next Steps**:
-  - Proceed with Phase 3/4. The LLM connection and Vercel routing currently use `fetch`, but we need to supply actual API keys into the sandbox `.env` to execute a true end-to-end "factory generation" of one of these newly discovered live apps.
+- **Objectives Accomplished**:
+  1. Consolidated the Next.js Dashboard UI onto a single, high-value page (`src/dashboard/src/app/page.js`) organized with:
+     - Top action bar: Instant Factory Cycle trigger, Dry Run trigger, and manual refresh.
+     - Live metric cards: Live Subdomains, Discovered Utilities, Daemon Health, and Host Memory/Uptime.
+     - Primary table: Active Subdomain Deployments with one-click copyable `<iframe>` embed snippets and direct live links.
+     - Secondary table: Discovered App Store Backlog with detailed timestamps.
+     - Terminal console: Real-time daemon output streaming from `factory.log`.
+     - Informative tooltips on all key controls and headers.
+  2. Implemented dashboard backend routes:
+     - `/api/pipeline/run`: Triggers the background orchestrator immediately with support for dry-run mode.
+     - `/api/pipeline/status`: Dynamically computes memory usage, uptime, database entity counts, and daemon status.
+  3. Created `src/tray.js` cross-platform server tray & process management controller:
+     - Commands: `--status`, `--run`, `--dry-run`, `--start-all`, `--quit`, `--help`.
+     - Gracefully terminates running servers on port 3000 and factory daemon processes.
+  4. Executed live factory cycles:
+     - Ingested 6 real-world apps into `src/discovery/discovery.db` (total count: 7).
+     - Generated and deployed `unit-converter-pro.utilityhub.com` into `src/deployer/routes.db` (total count: 3) and `docs/widgets/unit-converter-pro.md`.
+  5. Verified clean Next.js production build (`npm run build`) in `src/dashboard`.
+  6. Verified complete Vitest test suite (`npm test`) with all 13 test files and 20 tests passing.
+
+- **Current Version**: `4.1.0`
+- **Working Tree**: Clean, all changes committed and verified.
