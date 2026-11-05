@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info, CodeXml } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 export default function Dashboard() {
   const [apps, setApps] = useState([]);
@@ -20,12 +20,6 @@ export default function Dashboard() {
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const copyIframe = (subdomain) => {
-     const snippet = `<iframe src="https://${subdomain}" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>`;
-     navigator.clipboard.writeText(snippet);
-     alert("Iframe snippet copied to clipboard!");
-  }
 
   return (
     <TooltipProvider>
@@ -56,7 +50,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Apps Table */}
           <Card className="shadow-sm">
             <CardHeader className="bg-slate-50/50 border-b pb-4">
@@ -105,19 +99,19 @@ export default function Dashboard() {
                  <Tooltip>
                    <TooltipTrigger><Info className="h-4 w-4 text-slate-400" /></TooltipTrigger>
                    <TooltipContent>
-                     <p>Live web URLs dynamically provisioned via the Vercel API. Copy the Embed Snippet to quickly render the Vanilla JS utility in your CMS.</p>
+                     <p>Live web URLs dynamically provisioned via the Vercel API. Click the link to view the generated Vanilla JS utility.</p>
                    </TooltipContent>
                  </Tooltip>
               </div>
-              <CardDescription>Currently hosted generated utilities & embed snippets.</CardDescription>
+              <CardDescription>Currently hosted generated utilities.</CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[100px]">Slug</TableHead>
-                    <TableHead>Live Subdomain Route</TableHead>
-                    <TableHead className="text-right">Embed Snippet</TableHead>
+                    <TableHead className="w-[100px]">Project ID</TableHead>
+                    <TableHead>Project Slug</TableHead>
+                    <TableHead className="text-right">Live Subdomain Route</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -126,18 +120,13 @@ export default function Dashboard() {
                   ) : (
                       routes.map(route => (
                           <TableRow key={route.id}>
-                              <TableCell className="font-medium text-slate-500">{route.slug}</TableCell>
-                              <TableCell>
+                              <TableCell className="font-medium">{route.id}</TableCell>
+                              <TableCell>{route.slug}</TableCell>
+                              <TableCell className="text-right">
                                   <a href={`https://${route.subdomain}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1">
                                       {route.subdomain}
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                                   </a>
-                              </TableCell>
-                              <TableCell className="text-right">
-                                  <button onClick={() => copyIframe(route.subdomain)} className="text-xs inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-1 px-2 rounded border border-slate-300 transition-colors">
-                                     <CodeXml size={12} />
-                                     Copy Iframe
-                                  </button>
                               </TableCell>
                           </TableRow>
                       ))

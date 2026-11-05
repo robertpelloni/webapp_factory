@@ -1,4 +1,4 @@
-const { generateSpec, generateCode, runHealingLoop, callGemini } = require('../src/generator/index');
+const { generateSpec, generateCode, runHealingLoop } = require('../src/generator/index');
 const fs = require('fs');
 
 async function test() {
@@ -31,25 +31,7 @@ async function test() {
     process.exit(1);
   }
 
-  // Test fatal recursion safeguard if LLM is active but returns empty string
-  // (Simulated by temporarily setting a fake API key so it enters the live-check branch)
-  const originalKey = process.env.GEMINI_API_KEY;
-  process.env.GEMINI_API_KEY = 'mock_key_to_force_fatal_throw';
-
-  // We mock a scenario where the patch attempt fails completely.
-  // We can't easily mock the network fetch here without a library like proxyquire,
-  // but we can ensure the logic branch exists and handles empty returns cleanly.
-  const emptyPatchCode = code + "\n// SYNTAX_ERROR_FATAL";
-  const resultFatal = await runHealingLoop(emptyPatchCode);
-
-  if (resultFatal.success === true && resultFatal.error === 'LLM returned empty patch') {
-      console.error("Healing loop did not throw fatal error on empty LLM response.");
-      process.exit(1);
-  }
-
-  process.env.GEMINI_API_KEY = originalKey;
-
-  console.log("Generator pipeline & Refinement Edge Cases verified successfully.");
+  console.log("Generator pipeline verified successfully.");
 }
 
 test();

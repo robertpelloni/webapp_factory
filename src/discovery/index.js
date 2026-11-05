@@ -1,7 +1,5 @@
 const { initDb, isAppProcessed, markAppProcessed } = require('./db.js');
 const { scrapeTrendingApps } = require('./scraper.js');
-const { scrapeTrendingPrompts } = require('./prompts.js');
-const { scrapeProductHunt } = require('./producthunt.js');
 const logger = require('../logger');
 
 // We reuse the callGemini pattern from generator, but implement it locally to avoid circular dependencies
@@ -42,14 +40,14 @@ async function scrapeAppStore() {
   return await scrapeTrendingApps();
 }
 
-async function fetchProductHunt() {
-  return await scrapeProductHunt();
+async function scrapeProductHunt() {
+  return [];
 }
 
 async function runDiscovery() {
   await initDb();
 
-  const apps = [...await scrapeAppStore(), ...await fetchProductHunt(), ...await scrapeTrendingPrompts()];
+  const apps = await scrapeAppStore();
   const feasibleApps = [];
 
   for (const app of apps) {
@@ -68,7 +66,7 @@ async function runDiscovery() {
 
 module.exports = {
   scrapeAppStore,
-  fetchProductHunt,
+  scrapeProductHunt,
   checkFeasibilityWithGemini,
   runDiscovery
 };

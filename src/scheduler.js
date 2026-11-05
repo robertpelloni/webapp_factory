@@ -1,10 +1,9 @@
 const logger = require('./logger');
 const cron = require('node-cron');
 const { runDiscovery } = require('./discovery');
-const { generateSpec, generateCode, runHealingLoop, callGemini } = require('./generator');
+const { generateSpec, generateCode, runHealingLoop } = require('./generator');
 const { deployApp } = require('./deployer');
 const { generateMetadata, updateSitemap } = require('./seo');
-const { generateWidgetDocs, saveDocs } = require('./docs');
 
 async function runFactoryCycle(isDryRun = false) {
   logger.info(`\n=== Starting Factory Cycle [Dry Run: ${isDryRun}] ===\n`);
@@ -42,10 +41,6 @@ async function runFactoryCycle(isDryRun = false) {
          logger.error(`[Factory] Code failed healing loop for ${app.name}. Skipping deploy.`);
          continue;
       }
-
-      // Documentation Generation Phase
-      const markdownDocs = await generateWidgetDocs(spec, healingResult.code, callGemini);
-      saveDocs(app.name, markdownDocs);
 
       const deployResult = await deployApp(app.name, healingResult.code, healingResult.tempDir);
 

@@ -16,7 +16,7 @@ async function createVercelProject(slug, token) {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ name: slug, framework: null })
+      body: JSON.stringify({ name: slug, framework: "nextjs" })
     });
 
     if (!response.ok) {
@@ -55,33 +55,6 @@ function getFilesForVercel(dir, baseDir = dir) {
   return results;
 }
 
-async function assignDomainToProject(projectId, domain, token) {
-  if (token === 'mock_token' || !token) {
-    logger.info(`[Vercel Mock] Assigned domain ${domain} to project ${projectId}`);
-    return true;
-  }
-
-  logger.info(`[Vercel API] Assigning domain ${domain} to project ${projectId}`);
-  try {
-    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains`, {
-      method: 'POST',
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name: domain })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to assign domain: ${response.statusText}`);
-    }
-    return true;
-  } catch (err) {
-    logger.error(err);
-    return false;
-  }
-}
-
 async function deployToVercel(projectId, tempWorkspaceDir, token) {
   if (token === 'mock_token' || !token || !tempWorkspaceDir) {
      logger.info(`[Vercel Mock] Deploying code to project: ${projectId}`);
@@ -91,6 +64,7 @@ async function deployToVercel(projectId, tempWorkspaceDir, token) {
   logger.info(`[Vercel API] Packaging and deploying full workspace to: ${projectId}`);
 
   try {
+    // We now package the ENTIRE generated template workspace, not just the single file
     const filesArray = getFilesForVercel(tempWorkspaceDir);
 
     const response = await fetch('https://api.vercel.com/v13/deployments', {
@@ -102,7 +76,7 @@ async function deployToVercel(projectId, tempWorkspaceDir, token) {
       body: JSON.stringify({
         name: projectId,
         files: filesArray,
-        projectSettings: { framework: null }
+        projectSettings: { framework: 'nextjs' }
       })
     });
 
@@ -114,12 +88,11 @@ async function deployToVercel(projectId, tempWorkspaceDir, token) {
     return data.url;
   } catch(err) {
       logger.error(err);
-      return `${projectId}.vercel.app`; // Fallback format for testing/resilience
+      return `${projectId}.vercel.app`;
   }
 }
 
 module.exports = {
   createVercelProject,
-  assignDomainToProject,
   deployToVercel
 };

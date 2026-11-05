@@ -10,8 +10,8 @@ async function test() {
   const newApps = await runDiscovery();
   console.log("Newly Discovered Feasible Apps:", newApps.map(a => a.name));
 
-  if (newApps.length !== 4) {
-    console.error("Test failed, expected 4 feasible apps.");
+  if (newApps.length !== 2) {
+    console.error("Test failed, expected 2 feasible apps.");
     process.exit(1);
   }
 

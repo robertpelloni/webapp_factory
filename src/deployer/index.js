@@ -2,7 +2,7 @@ const logger = require('../logger');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { Pool } = require('pg');
-const { createVercelProject, deployToVercel, assignDomainToProject } = require('./vercel');
+const { createVercelProject, deployToVercel } = require('./vercel');
 
 let db;
 let pgPool;
@@ -97,10 +97,6 @@ async function deployApp(appName, code, tempDir = null) {
 
   const token = process.env.VERCEL_API_TOKEN || 'mock_token';
   const project = await createVercelProject(slug, token);
-
-  // Assign Domain explicitly via the new Vercel assignDomain helper
-  await assignDomainToProject(project.projectId, subdomain, token);
-
   const deployedUrl = await deployToVercel(project.projectId, tempDir, token);
 
   logger.info(`[Deployer] Vercel returned deployment URL: ${deployedUrl}`);
@@ -108,7 +104,7 @@ async function deployApp(appName, code, tempDir = null) {
   await saveRoute(slug, subdomain);
   logger.info(`[Deployer] Successfully mapped ${appName} to ${subdomain}`);
 
-  return { slug, subdomain, deployedUrl, projectId: project.projectId };
+  return { slug, subdomain, deployedUrl };
 }
 
 module.exports = {
