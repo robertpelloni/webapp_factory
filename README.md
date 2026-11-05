@@ -1,43 +1,49 @@
-# webapp_factory
+# Autonomous Utility Factory
 
-**This repository contains no code.** Its only file is the document that
-used to be this README: a plan for an automated "software factory", plus a
-detailed execution plan written for Google Jules to build it. The factory
-was never built (one session, two commits, 2026-06-24).
+A fully autonomous application factory built to dynamically discover, generate, deploy, and promote client-side web utilities based on real-time app store trends.
 
-## The design in the document
+## Project Structure
+- **/src/discovery**: Uses Playwright and ScrapingAnt to poll RSS feeds (Apple Top Charts, Product Hunt) and scrape trending prompts. Dedupes entries via SQLite/PostgreSQL.
+- **/src/generator**: An LLM-powered engine (Gemini API) that writes lightweight, embed-ready Single-File Widgets (HTML / Vanilla JS / Tailwind). Includes an automated healing loop (`node -c` syntax validation).
+- **/src/deployer**: Pushes generated code to the cloud dynamically via Vercel's REST API and actively manages Wildcard Subdomain Routing mapping.
+- **/src/seo**: Generates meta tags, patches sitemaps programmatically, and pings the Google Search Console API.
+- **/src/docs**: Utilizes an automated GitHub Actions pipeline and LLM extraction to generate markdown widget documentation.
+- **/src/dashboard**: A local Next.js monitoring UI to view daemon logs, discovered backlogs, and actively deployed Vercel subdomains.
 
-A self-replicating pipeline that treats app-store charts as a demand map
-and mass-produces web versions of simple utilities:
+## Setup & Running Locally
 
-1. **Trend scraper** — App Store top charts (RSS/Playwright), Product Hunt
-   API, GitHub trending; an LLM feasibility filter keeps micro-utilities
-   (calculator, unit converter, image compressor) and rejects platforms
-   and backend-heavy apps.
-2. **Spec agent** — deconstructs the target app into a rigid JSON spec
-   (app name, Next.js/Tailwind framework, component list, allowed
-   libraries only).
-3. **Code engine** — component-by-component generation, then a self-healing
-   loop: build in Docker, pipe errors back to the coding model, max 3
-   patch attempts before human alert. Hard cost guardrail: pause any app
-   that burns more than ~$2 of generation tokens.
-4. **Repo & deploy** — GitHub API creates a repo per app; deploy via
-   Vercel/Hetzner; Cloudflare API provisions subdomains (or a cheap TLD
-   for high trend scores).
-5. **Promotion engine** — programmatic SEO (generated meta/schema/landing
-   copy, Search Console URL submission), directory submissions
-   (AlternativeTo, Product Hunt), and social-thread discovery for
-   "web alternative to X?" questions.
-6. **Guardrails** — no original app names in titles/URLs (trademark),
-   client-side-only execution for generated apps handling user files
-   (sandboxing + cost).
+Ensure you have Node.js v20+ and Docker installed.
 
-The second half of the transcript converts all of this into a
-Jules-ready execution plan (repo layout, `AGENTS.md` contents, workflow
-spec, submodule references) — preserved in git history.
+### Standard Setup
 
-## Status
+```bash
+# 1. Install Dependencies
+npm install
+npm run test
 
-Blueprint only. Nothing here scrapes, generates, deploys, or promotes
-anything; it is a plan for a system that would do those things, with the
-cost and platform-abuse risks named in its own challenges section.
+# 2. Setup Env Variables
+cp .env.example .env
+# Populate GEMINI_API_KEY, VERCEL_API_TOKEN, etc.
+
+# 3. Boot Dashboard & Daemon Pipeline
+node index.js
+```
+
+### Docker Usage
+The entire factory, including headless Playwright browsers and the monitoring dashboard, is containerized.
+
+```bash
+docker-compose up --build -d
+```
+Access the Live Monitoring Dashboard at `http://localhost:3000`.
+
+## Testing & Compatibility Validation
+Vitest is used for E2E and Unit testing. We utilize a comprehensive Playwright Integration Test Matrix to cross-check Chromium, Firefox, and WebKit to guarantee iframe compatibility.
+
+```bash
+# Run all E2E mocking and DOM integration checks
+npm run test
+```
+
+## Latest Updates (v3.0.0)
+The Factory has pivoted away from generating heavy Next.js projects to generating lightning-fast **Single-File Vanilla JS** widgets. These widgets are strictly restricted from global CSS/DOM mutations to guarantee flawless integration into any legacy CMS iframe. Documentation is now fully automated.

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  webapp-factory:
+    build: .
+    container_name: webapp-factory
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./factory.log:/app/factory.log
+      - ./error.log:/app/error.log
+      - ./src/discovery/discovery.db:/app/src/discovery/discovery.db
+      - ./src/deployer/routes.db:/app/src/deployer/routes.db
