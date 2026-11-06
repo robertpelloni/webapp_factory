@@ -2,6 +2,9 @@
 
 ## [4.1.0] - 2026-11-05
 ### Added
+- Multi-Tenant Vercel Deployment Inspection: added `verifyProjectDomain` and `getDeploymentStatus` to `src/deployer/vercel.js`.
+- Dashboard Multi-Tenant Status API: added `/api/deployer/status` returning provider configuration, wildcard status, verification strategy, and active tenant routes.
+- Dashboard Multi-Tenant UI Badge: added Vercel mode badge (Live/Mock) and tooltip to Live Subdomains card.
 - Resilient scraper navigation: configured `--no-sandbox` and `--disable-setuid-sandbox` across Product Hunt and ChatGPT prompts scrapers with `domcontentloaded` wait strategy and timeout safeguards.
 - Ingested prompt micro-utility into `discovery.db` and deployed `ready-to-get-started.utilityhub.com` into `routes.db` with docs at `docs/widgets/ready-to-get-started.md`.
 - Automated factory cycle execution via CLI / Tray Controller (`node src/tray.js --run`, `node src/tray.js --dry-run`).

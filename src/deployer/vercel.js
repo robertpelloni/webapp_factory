@@ -118,8 +118,65 @@ async function deployToVercel(projectId, tempWorkspaceDir, token) {
   }
 }
 
+async function verifyProjectDomain(projectId, domain, token) {
+  if (token === 'mock_token' || !token) {
+    logger.info(`[Vercel Mock] Verified domain ${domain} for project ${projectId}`);
+    return { verified: true, configuredBy: 'CNAME', apexName: 'utilityhub.com' };
+  }
+
+  logger.info(`[Vercel API] Verifying domain ${domain} for project ${projectId}`);
+  try {
+    const response = await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains/${domain}/verify`, {
+      method: 'POST',
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to verify domain: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return { verified: data.verified, configuredBy: data.configuredBy || 'CNAME' };
+  } catch (err) {
+    logger.error(err);
+    return { verified: false, error: err.message };
+  }
+}
+
+async function getDeploymentStatus(deploymentId, token) {
+  if (token === 'mock_token' || !token) {
+    logger.info(`[Vercel Mock] Queried deployment status for: ${deploymentId}`);
+    return { status: 'READY', readyState: 'READY', url: `${deploymentId}.vercel.app` };
+  }
+
+  logger.info(`[Vercel API] Fetching deployment status for: ${deploymentId}`);
+  try {
+    const response = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}`, {
+      method: 'GET',
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch deployment status: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return { status: data.status, readyState: data.readyState, url: data.url };
+  } catch (err) {
+    logger.error(err);
+    return { status: 'ERROR', error: err.message };
+  }
+}
+
 module.exports = {
   createVercelProject,
   assignDomainToProject,
-  deployToVercel
+  deployToVercel,
+  verifyProjectDomain,
+  getDeploymentStatus
 };

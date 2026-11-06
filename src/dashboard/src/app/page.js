@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [routes, setRoutes] = useState([]);
   const [logs, setLogs] = useState('');
   const [status, setStatus] = useState(null);
+  const [deployerStatus, setDeployerStatus] = useState(null);
   const [triggering, setTriggering] = useState(false);
   const [triggerMsg, setTriggerMsg] = useState('');
   const [copiedSlug, setCopiedSlug] = useState(null);
@@ -45,6 +46,11 @@ export default function Dashboard() {
       .then(res => res.json())
       .then(data => setStatus(data))
       .catch(() => setStatus(null));
+
+    fetch('/api/deployer/status')
+      .then(res => res.json())
+      .then(res => res.success && setDeployerStatus(res.data))
+      .catch(() => setDeployerStatus(null));
 
     fetch('/api/logs')
       .then(res => res.text())
@@ -178,13 +184,26 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-slate-900 border-slate-800 text-slate-100 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs font-medium text-slate-400 uppercase tracking-wider">
-                Live Subdomains
-              </CardTitle>
+              <div className="flex items-center gap-1.5">
+                <CardTitle className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  Live Subdomains
+                </CardTitle>
+                <Tooltip>
+                  <TooltipTrigger><Info className="h-3 w-3 text-slate-500" /></TooltipTrigger>
+                  <TooltipContent>
+                    <p>Mode: {deployerStatus?.mode || 'simulated-mock'} | Wildcard: {deployerStatus?.wildcardDomain || '*.utilityhub.com'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Globe2 className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{routes.length}</div>
+              <div className="flex items-baseline justify-between">
+                <div className="text-2xl font-bold text-white">{routes.length}</div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">
+                  {deployerStatus?.mode === 'live-api' ? 'Vercel Live' : 'Vercel Mock'}
+                </span>
+              </div>
               <p className="text-xs text-slate-400 mt-1">Multi-tenant deployed widgets</p>
             </CardContent>
           </Card>

@@ -19,8 +19,12 @@
      - Generated and deployed `unit-converter-pro.utilityhub.com` and `ready-to-get-started.utilityhub.com` into `src/deployer/routes.db` (total count: 4) and documentation in `docs/widgets/`.
   5. Hardened Discovery Scrapers:
      - Configured container-safe `--no-sandbox` flags and `domcontentloaded` strategies with timeout bounds across `producthunt.js` and `prompts.js`.
-  6. Verified clean Next.js production build (`npm run build`) in `src/dashboard`.
-  7. Verified complete Vitest test suite (`npm test`) with all 13 test files and 20 tests passing.
+  6. Phase 4 Multi-Tenant Vercel Deployment Enhancements:
+     - Added `verifyProjectDomain` and `getDeploymentStatus` to `src/deployer/vercel.js`.
+     - Created `/api/deployer/status` endpoint in the dashboard.
+     - Added Multi-Tenant Vercel mode badge and wildcard routing info in dashboard UI.
+  7. Verified clean Next.js production build (`npm run build`) in `src/dashboard`.
+  8. Verified complete Vitest test suite (`npm test`) with all 13 test files and 20 tests passing.
 
 - **Current Version**: `4.1.0`
 - **Working Tree**: Clean, all changes committed and verified.
