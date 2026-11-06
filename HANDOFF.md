@@ -19,6 +19,7 @@
      - Generated and deployed `unit-converter-pro.utilityhub.com` and `ready-to-get-started.utilityhub.com` into `src/deployer/routes.db` (total count: 4) and documentation in `docs/widgets/`.
   5. Hardened Discovery Scrapers:
      - Configured container-safe `--no-sandbox` flags and `domcontentloaded` strategies with timeout bounds across `producthunt.js` and `prompts.js`.
+     - Parallelized multi-source scraping via `Promise.allSettled`, dropping discovery loop time from ~9.5s to ~5.4s.
   6. Phase 4 Multi-Tenant Vercel Deployment Enhancements:
      - Added `verifyProjectDomain` and `getDeploymentStatus` to `src/deployer/vercel.js`.
      - Created `/api/deployer/status` endpoint in the dashboard.

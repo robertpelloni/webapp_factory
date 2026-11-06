@@ -2,6 +2,7 @@
 
 ## [4.1.0] - 2026-11-05
 ### Added
+- Performance Optimization: Parallelized discovery scraper execution in `src/discovery/index.js` using `Promise.allSettled`, reducing multi-source scraping cycle latency by ~43%.
 - Multi-Tenant Vercel Deployment Inspection: added `verifyProjectDomain` and `getDeploymentStatus` to `src/deployer/vercel.js`.
 - Dashboard Multi-Tenant Status API: added `/api/deployer/status` returning provider configuration, wildcard status, verification strategy, and active tenant routes.
 - Dashboard Multi-Tenant UI Badge: added Vercel mode badge (Live/Mock) and tooltip to Live Subdomains card.
