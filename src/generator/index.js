@@ -159,17 +159,17 @@ async function runHealingLoop(code, maxAttempts = 3) {
         logger.info(`[Healing Loop] Requesting patch from LLM...`);
 
         const patchPrompt = `
-          The following Next.js React code failed to build with error:
+          The following single-file HTML/Vanilla JS code failed validation with error:
           ${errorMsg}
-          Fix the code and return the entire corrected file. Return ONLY valid code.
+          Fix the code and return the entire corrected HTML file. Return ONLY valid code.
           Code:
           ${currentCode}
         `;
 
         const llmPatch = await callGemini(patchPrompt);
 
-        if (llmPatch) {
-             currentCode = llmPatch.replace(/```jsx?/g, '').replace(/```tsx?/g, '').replace(/```/g, '').trim();
+        if (llmPatch && llmPatch.trim() !== '') {
+             currentCode = llmPatch.replace(/```html/g, '').replace(/```/g, '').trim();
         } else {
              currentCode = currentCode.replace("SYNTAX_ERROR", "/* fixed */");
         }
