@@ -19,20 +19,29 @@ async function scrapeTrendingPrompts() {
        ];
     }
 
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
-    await page.goto(targetUrl);
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.waitForTimeout(2000);
 
     // Evaluate the DOM to extract prompts
     const prompts = await page.evaluate(() => {
-      const headings = Array.from(document.querySelectorAll('h2[id^="act-as"]'));
+      // Look for headings with act-as, prompt headings, or article headings
+      let headings = Array.from(document.querySelectorAll('h2[id^="act-as"], h2, h3'));
+      if (headings.length === 0) {
+        headings = Array.from(document.querySelectorAll('article h2, article h3'));
+      }
+
       return headings.map(heading => {
-        let name = heading.textContent.replace('#', '').trim();
+        let name = heading.textContent.replace(/^[#\s]+/, '').trim();
         let description = '';
         let nextEl = heading.nextElementSibling;
-        while (nextEl && nextEl.tagName !== 'H2') {
-            if (nextEl.tagName === 'P' || nextEl.tagName === 'BLOCKQUOTE') {
+        while (nextEl && nextEl.tagName !== 'H2' && nextEl.tagName !== 'H3') {
+            if (nextEl.tagName === 'P' || nextEl.tagName === 'BLOCKQUOTE' || nextEl.tagName === 'DIV') {
                 description += nextEl.textContent.trim() + ' ';
             }
             nextEl = nextEl.nextElementSibling;
@@ -40,10 +49,10 @@ async function scrapeTrendingPrompts() {
 
         return {
           name: name,
-          description: description.substring(0, 300).trim(), // Limit description length
+          description: description.substring(0, 300).trim(),
           category: 'AI Prompt Utility'
         };
-      }).filter(p => p.name && p.description);
+      }).filter(p => p.name && p.name.length > 3 && p.description && p.description.length > 10);
     });
 
     // Limit to top 10 for processing

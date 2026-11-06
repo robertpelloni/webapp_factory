@@ -166,16 +166,16 @@ async function runHealingLoop(code, maxAttempts = 3) {
 
         const patchPrompt = `
           The following single-file HTML/Vanilla JS code failed validation with error:
-          \${errorMsg}
+          ${errorMsg}
           Fix the code and return the entire corrected HTML file. Return ONLY valid code.
           Code:
-          \${currentCode}
+          ${currentCode}
         `;
 
         const llmPatch = await callGemini(patchPrompt);
 
         if (llmPatch && llmPatch.trim() !== '') {
-             currentCode = llmPatch.replace(/\\`\\`\\`html/g, '').replace(/\\`\\`\\`/g, '').trim();
+             currentCode = llmPatch.replace(/```html/g, '').replace(/```/g, '').trim();
         } else {
              // In mock mode without a real API key, we fallback.
              // If we're on the final attempt and an LLM fails to return code, we must not falsely mock it as "fixed" in a real setting.

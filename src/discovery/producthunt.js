@@ -19,11 +19,16 @@ async function scrapeProductHunt() {
        ];
     }
 
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
-    // Product Hunt relies heavily on client-side rendering. Wait for the main feed to load.
-    await page.goto(targetUrl, { waitUntil: 'networkidle' });
+    // Product Hunt relies heavily on client-side rendering. Wait for domcontentloaded with sensible timeout
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    // Allow hydration/feed elements to render
+    await page.waitForTimeout(3000);
 
     // Evaluate the DOM to extract the top products of the day
     const apps = await page.evaluate(() => {
