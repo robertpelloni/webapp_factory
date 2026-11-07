@@ -18,7 +18,9 @@ import {
   Zap,
   Globe2,
   FileCode2,
-  Terminal
+  Terminal,
+  Eye,
+  X
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -30,6 +32,7 @@ export default function Dashboard() {
   const [triggering, setTriggering] = useState(false);
   const [triggerMsg, setTriggerMsg] = useState('');
   const [copiedSlug, setCopiedSlug] = useState(null);
+  const [previewSubdomain, setPreviewSubdomain] = useState(null);
 
   const fetchData = () => {
     fetch('/api/apps')
@@ -312,32 +315,71 @@ export default function Dashboard() {
                         {route.deployed_at || 'Active'}
                       </TableCell>
                       <TableCell className="text-right">
-                        <button
-                          onClick={() => copyIframe(route.subdomain, route.slug)}
-                          className={`text-xs inline-flex items-center gap-1.5 py-1.5 px-3 rounded-md transition-all font-medium border ${
-                            copiedSlug === route.slug
-                              ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/40'
-                              : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
-                          }`}
-                        >
-                          {copiedSlug === route.slug ? (
-                            <>
-                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <CodeXml className="h-3.5 w-3.5 text-slate-400" />
-                              Copy Iframe
-                            </>
-                          )}
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setPreviewSubdomain(previewSubdomain === route.subdomain ? null : route.subdomain)}
+                            className="text-xs inline-flex items-center gap-1.5 py-1.5 px-2.5 rounded-md transition-all font-medium border bg-blue-950/60 hover:bg-blue-900/60 text-blue-300 border-blue-700/60"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            {previewSubdomain === route.subdomain ? 'Close' : 'Preview'}
+                          </button>
+                          <button
+                            onClick={() => copyIframe(route.subdomain, route.slug)}
+                            className={`text-xs inline-flex items-center gap-1.5 py-1.5 px-3 rounded-md transition-all font-medium border ${
+                              copiedSlug === route.slug
+                                ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/40'
+                                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                            }`}
+                          >
+                            {copiedSlug === route.slug ? (
+                              <>
+                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                                Copied!
+                              </>
+                            ) : (
+                              <>
+                                <CodeXml className="h-3.5 w-3.5 text-slate-400" />
+                                Copy Iframe
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
                 )}
               </TableBody>
             </Table>
+
+            {/* Embedded Live Sandbox Drawer */}
+            {previewSubdomain && (
+              <div className="mt-4 p-4 border border-blue-500/30 bg-slate-950/80 rounded-lg space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-blue-400" />
+                    <span className="text-sm font-semibold text-white">Live Sandbox Preview:</span>
+                    <span className="text-xs font-mono text-blue-400">{previewSubdomain}</span>
+                  </div>
+                  <button
+                    onClick={() => setPreviewSubdomain(null)}
+                    className="text-slate-400 hover:text-white p-1 hover:bg-slate-800 rounded"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="bg-white rounded-md overflow-hidden border border-slate-800 h-96">
+                  <iframe
+                    src={`https://${previewSubdomain}`}
+                    title={previewSubdomain}
+                    className="w-full h-full border-0"
+                    sandbox="allow-scripts allow-forms allow-same-origin"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Sandboxed in isolated iframe container to prevent DOM/CSS bleed. Supports live testing and interactive validation.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
