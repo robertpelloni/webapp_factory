@@ -9,3 +9,9 @@
 - [x] Build a frontend dashboard to visualize the local SQLite DB data and monitor running pipelines.
 - [x] Implement robust error tracking and logging via Sentry or Winston for the background daemon.
 - [x] Containerize the orchestrator and dashboard via Docker.
+- [x] Consolidate dashboard UI into a single high-value page with interactive triggers and live metrics.
+- [x] Implement cross-platform server tray & process management controller (`src/tray.js`).
+- [x] Parallelize multi-source discovery scrapers using `Promise.allSettled`.
+- [x] Enhance multi-tenant Vercel deployer with domain verification and deployment status inspection.
+- [x] Add interactive live sandbox preview drawer to dashboard table for instant widget testing.
+- [ ] Add webhook notification alerts (Discord/Slack) for factory generation failures.

@@ -47,7 +47,22 @@ async function scrapeProductHunt() {
 async function runDiscovery() {
   await initDb();
 
-  const apps = await scrapeAppStore();
+  // Execute scrapers concurrently to optimize discovery throughput and reduce latency
+  const results = await Promise.allSettled([
+    scrapeTrendingApps(),
+    scrapeProductHunt(),
+    scrapeTrendingPrompts()
+  ]);
+
+  const apps = [];
+  for (const res of results) {
+    if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+      apps.push(...res.value);
+    } else if (res.status === 'rejected') {
+      logger.error(`[Discovery] Scraper task failed: ${res.reason?.message || res.reason}`);
+    }
+  }
+
   const feasibleApps = [];
 
   for (const app of apps) {
