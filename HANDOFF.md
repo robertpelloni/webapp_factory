@@ -30,6 +30,10 @@
   9. Verified complete Vitest test suite (`npm test`) with all 13 test files and 20 tests passing.
   10. Automated CI/CD Pipeline Integration:
      - Implemented `.github/workflows/ci.yml` defining end-to-end automated testing, Next.js dashboard production builds, dry-run smoke testing, and daemon tray health assertions.
+  11. Programmatic SEO Operations (Phase 5):
+     - Added Google Search Console site verification meta generation (`generateGoogleVerificationMeta`), dynamic robots.txt generation (`generateRobotsTxt`), sitemap URL extraction (`getSitemapUrls`), and batch indexing queue (`batchTriggerIndexing`).
+     - Created `/api/seo` Next.js endpoint reporting sitemap URLs, index status, and verification configuration.
+     - Expanded test coverage in `tests/seo.test.js` to 8 tests.
 
 - **Current Version**: `4.1.0`
 - **Working Tree**: Clean, all changes committed and verified.

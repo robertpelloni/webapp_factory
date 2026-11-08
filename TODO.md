@@ -15,4 +15,5 @@
 - [x] Enhance multi-tenant Vercel deployer with domain verification and deployment status inspection.
 - [x] Add interactive live sandbox preview drawer to dashboard table for instant widget testing.
 - [x] Set up CI/CD pipeline workflow (`.github/workflows/ci.yml`) with automated testing, build verification, and pipeline smoke tests.
+- [x] Complete Programmatic SEO Operations (Phase 5): Google Search Console site verification, dynamic robots.txt, batch indexing queue, and `/api/seo` dashboard endpoint.
 - [ ] Add webhook notification alerts (Discord/Slack) for factory generation failures.
