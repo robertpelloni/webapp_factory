@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [4.2.0] - 2026-11-08
+### Added
+- Phase 5 Programmatic SEO Operations: Full automated sitemap XML updating with duplicate entry deduplication, dynamic robots.txt generation, Google Search Console site verification meta generator, and batch URL indexing API trigger (`src/seo/index.js`).
+- Next.js SEO Monitoring Endpoint (`/api/seo`): Exposes indexed URL statistics, credentials verification, and sitemap counts to the dashboard.
+- Real-Time Webhook Alerting Pipeline (`src/notifications.js`): Discord and Slack alert integrations with automatic mock fallback; integrated directly into daemon scheduler events (`src/scheduler.js`).
+- Interactive Webhook Test Endpoint (`/api/pipeline/webhook-test`): Supports manual trigger of test alert dispatches from the dashboard UI.
+- Unified Single-Page Dashboard Refinements: Added dedicated SEO & Sitemap metrics card, real-time live search filter bar across deployed subdomains and discovered backlog, and live test alert controls.
+- Comprehensive Test Coverage Expansion: Added `tests/seo.test.js` and `tests/notifications.test.js` bringing test suite to 14 Vitest suites and 29 unit/integration tests with 100% pass rate.
+
 ## [4.1.0] - 2026-11-05
 ### Added
 - Factory Webhook Notifications (`src/notifications.js`): Discord and Slack alert dispatches for spec generation warnings, self-healing loop failures, deployment successes, and fatal pipeline exceptions.

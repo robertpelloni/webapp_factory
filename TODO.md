@@ -17,3 +17,6 @@
 - [x] Set up CI/CD pipeline workflow (`.github/workflows/ci.yml`) with automated testing, build verification, and pipeline smoke tests.
 - [x] Complete Programmatic SEO Operations (Phase 5): Google Search Console site verification, dynamic robots.txt, batch indexing queue, and `/api/seo` dashboard endpoint.
 - [x] Add webhook notification alerts (Discord/Slack) for factory generation failures and deployment events (`src/notifications.js`).
+- [x] Expand dashboard UI with real-time text filter and interactive manual webhook trigger actions.
+- [ ] Connect production Google Search Console service account JSON (`gcp-service-account.json`) for live automated API indexing.
+- [ ] Add real-time WebSocket / SSE log streaming to dashboard for sub-second log updates.

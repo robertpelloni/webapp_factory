@@ -31,7 +31,7 @@
 Continuous integration and quality gates are defined in `.github/workflows/ci.yml`. On push and pull requests, GitHub Actions executes:
 1. Recursive submodule checkout and dependency caching.
 2. Playwright Chromium browser provisioning.
-3. Complete Vitest test matrix (all 13 unit and integration suites).
+3. Complete Vitest test matrix (all 14 unit and integration suites, 29 tests).
 4. Next.js dashboard production compilation.
 5. Autonomous factory dry-run pipeline smoke test.
 6. Tray and background daemon process health check.
