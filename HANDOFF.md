@@ -1,36 +1,25 @@
-# Session Handoff Summary (v4.2.0)
+# Session Handoff Summary (v4.3.0)
 
 - **Objectives Accomplished**:
-  1. Consolidated the Next.js Dashboard UI onto a single, high-value page (`src/dashboard/src/app/page.js`) organized with:
-     - Top action bar: Instant Factory Cycle trigger, Dry Run trigger, manual refresh, and interactive Test Webhook action.
-     - Global real-time search filter bar across deployed subdomains and discovered backlog.
-     - Live metric cards: Live Subdomains, Discovered Utilities, SEO & Sitemap, Daemon Health, and Host Memory/Uptime.
-     - Primary table: Active Subdomain Deployments with one-click copyable `<iframe>` embed snippets and interactive sandboxed live preview.
-     - Secondary table: Discovered App Store Backlog with detailed timestamps.
-     - Terminal console: Real-time daemon output streaming from `factory.log`.
-     - Informative tooltips on all key controls and headers.
-  2. Implemented dashboard backend routes:
-     - `/api/pipeline/run`: Triggers the background orchestrator immediately with support for dry-run mode.
-     - `/api/pipeline/status`: Dynamically computes memory usage, uptime, database entity counts, and daemon status.
-     - `/api/pipeline/webhook-test`: Dispatches manual test alerts to configured webhooks.
-     - `/api/deployer/status`: Reports Vercel provider status, wildcard domains, and active tenants.
-     - `/api/seo`: Reports sitemap counts, indexed URLs, GCP credentials status, and verification meta.
-  3. Created `src/tray.js` cross-platform server tray & process management controller:
-     - Commands: `--status`, `--run`, `--dry-run`, `--start-all`, `--quit`, `--help`.
-     - Gracefully terminates running servers on port 3000 and factory daemon processes.
-  4. Programmatic SEO Operations (Phase 5):
-     - Added Google Search Console site verification meta generation (`generateGoogleVerificationMeta`), dynamic robots.txt generation (`generateRobotsTxt`), sitemap URL extraction (`getSitemapUrls`), deduplicated sitemap updating (`updateSitemap`), and batch indexing queue (`batchTriggerIndexing`).
-     - Added 8 dedicated Vitest tests in `tests/seo.test.js`.
-  5. Real-Time Webhook Notifications (`src/notifications.js`):
-     - Implemented Discord and Slack webhook alert dispatches for spec generation, healing loop failures, deployment milestones, and fatal orchestrator exceptions.
-     - Integrated with scheduler events and tested with unit tests in `tests/notifications.test.js`.
-  6. Automated CI/CD Pipeline Integration:
-     - Implemented `.github/workflows/ci.yml` defining end-to-end automated testing, Next.js dashboard production builds, dry-run smoke testing, and daemon tray health assertions.
-  7. Discovery Scraper Parallelization & Hardening:
-     - Configured container-safe `--no-sandbox` flags and `domcontentloaded` strategies with timeout bounds across scrapers.
-     - Parallelized multi-source scraping via `Promise.allSettled`, reducing discovery loop latency by ~43%.
-  8. Verified clean Next.js production build (`npm run build`) in `src/dashboard`.
-  9. Verified complete Vitest test suite (`npm test`) with all 14 test suites and 29 tests passing (100% pass rate).
+  1. Consolidated and Reorganized Operational Scripts:
+     - Added unified root scripts in `package.json`: `npm run build:dashboard`, `npm run start:dashboard`, `npm run lint:dashboard`, and `npm run clean:logs`.
+     - Standardized container execution in `start-container.sh` to use `npm run start:dashboard`.
+  2. Hardened Dashboard Logs API & Observability:
+     - Updated `src/dashboard/src/app/api/logs/route.js` with flexible working directory resolution (`factory.log` found whether `process.cwd()` is repo root or `src/dashboard`).
+     - Added custom `?lines=N` query parameter with validation bounding up to 2000 lines (default 500 lines).
+     - Added empty log file fallback message.
+  3. UI & Styling Standardization:
+     - Refactored `src/dashboard/src/components/ui/card.jsx` to strict Tailwind v3 styling classes, removing Tailwind v4 custom property variables.
+  4. Expanded Automated Testing Suite:
+     - Added `tests/dashboard-api.test.js` validating line limits, query parameters, and empty log handling.
+     - Registered test in `vitest.config.js`, achieving 100% pass rate across 15 test suites and 31 unit/integration tests.
+  5. Consolidated Single-Page Monitoring Dashboard:
+     - Interactive controls: Run Factory Cycle, Dry Run, Refresh, Test Webhook.
+     - Metrics: Live Subdomains, Discovered Utilities, SEO & Sitemap, Daemon Health, Memory/Uptime.
+     - Tables: Live Subdomain Deployments with iframe embed snippets and sandboxed live preview drawer; Discovered App Store Backlog with timestamps.
+     - Observability: Real-time daemon console logs with search filter.
+  6. Documentation Governance:
+     - Sourced single global version `4.3.0` across `VERSION.md`, `package.json`, `CHANGELOG.md`, `TODO.md`, `ROADMAP.md`, `DEPLOY.md`, and `HANDOFF.md`.
 
-- **Current Version**: `4.2.0`
-- **Working Tree**: Clean, verified, and ready for deployment.
+- **Current Version**: `4.3.0`
+- **Working Tree**: Clean, verified, tested, and operational.
