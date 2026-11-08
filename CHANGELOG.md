@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [4.3.0] - 2026-11-08
+### Added
+- Consolidated and reorganized development and operational scripts in root `package.json` with `build:dashboard`, `start:dashboard`, `lint:dashboard`, and `clean:logs`.
+- Updated `start-container.sh` to use the unified `npm run start:dashboard` centralized script.
+- Hardened dashboard logs API (`/api/logs`) with line bounding, query parameter support (`?lines=N` up to 2000 lines), and empty file fallback handling.
+- Added test coverage in `tests/dashboard-api.test.js` and registered in `vitest.config.js`.
+- Bumping version to 4.3.0 across all documentation files and manifests.
+
 ## [4.2.0] - 2026-11-08
 ### Added
 - Phase 5 Programmatic SEO Operations: Full automated sitemap XML updating with duplicate entry deduplication, dynamic robots.txt generation, Google Search Console site verification meta generator, and batch URL indexing API trigger (`src/seo/index.js`).

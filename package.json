@@ -1,6 +1,6 @@
 {
   "name": "webapp_factory",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "Autonomous utility factory",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,10 @@
     "start:all": "node src/tray.js --start-all",
     "stop": "node src/tray.js --quit",
     "tray": "node src/tray.js",
+    "build:dashboard": "npm --prefix src/dashboard run build",
+    "start:dashboard": "npm --prefix src/dashboard run start",
+    "lint:dashboard": "npm --prefix src/dashboard run lint",
+    "clean:logs": "node -e \"const fs = require('fs'); ['factory.log', 'error.log'].forEach(f => { if(fs.existsSync(f)) fs.writeFileSync(f, ''); }); console.log('Logs truncated.');\"",
     "test": "vitest run"
   },
   "dependencies": {

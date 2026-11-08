@@ -1,11 +1,11 @@
-# DEPLOYMENT INSTRUCTIONS
+# DEPLOYMENT INSTRUCTIONS (v4.3.0)
 
 ## Quick Start
 1. Clone the repository and initialize submodules:
    ```bash
    git submodule update --init --recursive
    npm install
-   cd src/dashboard && npm install && npm run build && cd ../..
+   npm run build:dashboard
    ```
 
 2. Configure environment variables in `.env`:
