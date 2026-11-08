@@ -34,6 +34,9 @@
      - Added Google Search Console site verification meta generation (`generateGoogleVerificationMeta`), dynamic robots.txt generation (`generateRobotsTxt`), sitemap URL extraction (`getSitemapUrls`), and batch indexing queue (`batchTriggerIndexing`).
      - Created `/api/seo` Next.js endpoint reporting sitemap URLs, index status, and verification configuration.
      - Expanded test coverage in `tests/seo.test.js` to 8 tests.
+  12. Real-Time Webhook Notifications (`src/notifications.js`):
+     - Implemented Discord and Slack webhook alert dispatches for spec generation, healing loop failures, deployment milestones, and fatal orchestrator exceptions.
+     - Added unit tests in `tests/notifications.test.js` (total test suite: 14 test files, 29 tests passing).
 
 - **Current Version**: `4.1.0`
 - **Working Tree**: Clean, all changes committed and verified.

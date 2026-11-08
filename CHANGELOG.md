@@ -2,6 +2,7 @@
 
 ## [4.1.0] - 2026-11-05
 ### Added
+- Factory Webhook Notifications (`src/notifications.js`): Discord and Slack alert dispatches for spec generation warnings, self-healing loop failures, deployment successes, and fatal pipeline exceptions.
 - Programmatic SEO Operations (Phase 5): Added Google Search Console site verification meta generator, dynamic robots.txt generator, sitemap URL extraction, batch indexing triggers, and dashboard SEO status endpoint (`/api/seo`).
 - Automated CI/CD GitHub Actions Workflow: Added `.github/workflows/ci.yml` orchestrating automated dependencies installation, Vitest unit/integration testing (13 suites, 24 tests), Next.js dashboard build, factory dry-run smoke testing, and server tray health verification.
 - Interactive Widget Sandbox Preview: Added instant sandboxed iframe preview directly inside the dashboard Active Subdomain Deployments table with DOM/CSS isolation.

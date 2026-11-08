@@ -12,6 +12,7 @@
    - `GEMINI_API_KEY`: Google Gemini API key for spec and widget code generation.
    - `VERCEL_API_TOKEN`: Vercel API token for wildcard multi-tenant project deployments.
    - `DATABASE_URL`: Optional PostgreSQL connection string (falls back to local SQLite databases if unset).
+   - `FACTORY_WEBHOOK_URL`: Optional Discord or Slack incoming webhook URL for pipeline error and deployment notifications.
 
 3. Starting the Factory & Dashboard:
    - **Interactive Process Manager / Tray**:
