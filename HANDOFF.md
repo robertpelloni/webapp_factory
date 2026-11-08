@@ -28,6 +28,8 @@
      - Added integrated preview action in the Active Subdomain Deployments table, rendering an isolated sandboxed iframe for immediate visual verification without navigating away.
   8. Verified clean Next.js production build (`npm run build`) in `src/dashboard`.
   9. Verified complete Vitest test suite (`npm test`) with all 13 test files and 20 tests passing.
+  10. Automated CI/CD Pipeline Integration:
+     - Implemented `.github/workflows/ci.yml` defining end-to-end automated testing, Next.js dashboard production builds, dry-run smoke testing, and daemon tray health assertions.
 
 - **Current Version**: `4.1.0`
 - **Working Tree**: Clean, all changes committed and verified.

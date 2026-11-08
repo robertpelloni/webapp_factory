@@ -2,6 +2,7 @@
 
 ## [4.1.0] - 2026-11-05
 ### Added
+- Automated CI/CD GitHub Actions Workflow: Added `.github/workflows/ci.yml` orchestrating automated dependencies installation, Vitest unit/integration testing (13 suites, 20 tests), Next.js dashboard build, factory dry-run smoke testing, and server tray health verification.
 - Interactive Widget Sandbox Preview: Added instant sandboxed iframe preview directly inside the dashboard Active Subdomain Deployments table with DOM/CSS isolation.
 - Performance Optimization: Parallelized discovery scraper execution in `src/discovery/index.js` using `Promise.allSettled`, reducing multi-source scraping cycle latency by ~43%.
 - Multi-Tenant Vercel Deployment Inspection: added `verifyProjectDomain` and `getDeploymentStatus` to `src/deployer/vercel.js`.

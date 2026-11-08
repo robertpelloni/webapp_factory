@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    name: Test, Build & Smoke Test
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Vitest Unit & Integration Test Suite
+        run: npm run test
+
+      - name: Install Dashboard Dependencies
+        run: cd src/dashboard && npm ci
+
+      - name: Build Next.js Dashboard
+        run: cd src/dashboard && npm run build
+
+      - name: Smoke Test Factory Pipeline (Dry-Run)
+        run: node index.js --dry-run
+
+      - name: Verify Tray & Daemon Manager Status
+        run: node src/tray.js --status

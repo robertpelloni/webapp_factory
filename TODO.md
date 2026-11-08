@@ -14,4 +14,5 @@
 - [x] Parallelize multi-source discovery scrapers using `Promise.allSettled`.
 - [x] Enhance multi-tenant Vercel deployer with domain verification and deployment status inspection.
 - [x] Add interactive live sandbox preview drawer to dashboard table for instant widget testing.
+- [x] Set up CI/CD pipeline workflow (`.github/workflows/ci.yml`) with automated testing, build verification, and pipeline smoke tests.
 - [ ] Add webhook notification alerts (Discord/Slack) for factory generation failures.
