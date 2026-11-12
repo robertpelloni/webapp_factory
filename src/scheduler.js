@@ -4,6 +4,8 @@ const { runDiscovery } = require('./discovery');
 const { generateSpec, generateCode, runHealingLoop } = require('./generator');
 const { deployApp } = require('./deployer');
 const { generateMetadata, updateSitemap } = require('./seo');
+const { generateWidgetDocs, saveDocs } = require('./docs');
+const { sendWebhookAlert } = require('./notifications');
 
 async function runFactoryCycle(isDryRun = false) {
   logger.info(`\n=== Starting Factory Cycle [Dry Run: ${isDryRun}] ===\n`);
@@ -21,25 +23,43 @@ async function runFactoryCycle(isDryRun = false) {
 
       const spec = await generateSpec(app);
       if (!spec) {
-         logger.error(`[Factory] Failed to generate spec for ${app.name}. Skipping.`);
-         continue;
+        logger.error(`[Factory] Failed to generate spec for ${app.name}. Skipping.`);
+        await sendWebhookAlert({
+          type: 'warn',
+          title: 'Spec Generation Failed',
+          message: `Unable to generate architectural spec for app: ${app.name}`,
+          details: { app: app.name, category: app.category || 'Utilities' }
+        });
+        continue;
       }
 
       const code = await generateCode(spec);
       if (!code) {
-         logger.error(`[Factory] Failed to generate code for ${app.name}. Skipping.`);
-         continue;
+        logger.error(`[Factory] Failed to generate code for ${app.name}. Skipping.`);
+        await sendWebhookAlert({
+          type: 'warn',
+          title: 'Code Generation Failed',
+          message: `Unable to synthesize widget code for spec: ${spec.app_name}`,
+          details: { app: app.name }
+        });
+        continue;
       }
 
       if (isDryRun) {
-         logger.info(`[Factory Dry Run] Spec & Code generated successfully. Skipping deploy/SEO.`);
-         continue;
+        logger.info(`[Factory Dry Run] Spec & Code generated successfully. Skipping deploy/SEO.`);
+        continue;
       }
 
       const healingResult = await runHealingLoop(code);
       if (!healingResult.success) {
-         logger.error(`[Factory] Code failed healing loop for ${app.name}. Skipping deploy.`);
-         continue;
+        logger.error(`[Factory] Code failed healing loop for ${app.name}. Skipping deploy.`);
+        await sendWebhookAlert({
+          type: 'error',
+          title: 'Self-Healing Loop Failure',
+          message: `Widget code failed healing attempts for app: ${app.name}`,
+          details: { app: app.name, attempts: healingResult.attempts, error: healingResult.error || 'Syntax validation failed' }
+        });
+        continue;
       }
 
       const deployResult = await deployApp(app.name, healingResult.code, healingResult.tempDir);
@@ -50,10 +70,22 @@ async function runFactoryCycle(isDryRun = false) {
       updateSitemap(deployResult.subdomain);
 
       logger.info(`[Factory] Successfully completed pipeline for: ${app.name}`);
+      await sendWebhookAlert({
+        type: 'info',
+        title: 'New Utility Deployed',
+        message: `Successfully generated and deployed ${app.name} to https://${deployResult.subdomain}`,
+        details: { app: app.name, subdomain: deployResult.subdomain }
+      });
     }
 
   } catch (err) {
-      logger.error("[Factory] Fatal Error during cycle:", err);
+    logger.error("[Factory] Fatal Error during cycle:", err);
+    await sendWebhookAlert({
+      type: 'error',
+      title: 'Factory Fatal Pipeline Error',
+      message: err.message || 'Unknown runtime error occurred in factory cycle',
+      details: { stack: err.stack ? err.stack.substring(0, 300) : '' }
+    });
   }
   logger.info(`\n=== Finished Factory Cycle ===\n`);
 }

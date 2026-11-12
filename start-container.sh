@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Start the dashboard in the background
-cd src/dashboard
-npm run start &
+# Start the dashboard in the background using the centralized root script
+npm run start:dashboard &
 
-# Return to root and start the orchestrator daemon
-cd ../..
+# Start the orchestrator daemon in cron mode
 npm start -- --cron

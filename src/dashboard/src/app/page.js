@@ -20,7 +20,10 @@ import {
   FileCode2,
   Terminal,
   Eye,
-  X
+  X,
+  Search,
+  BellRing,
+  Compass
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -29,10 +32,12 @@ export default function Dashboard() {
   const [logs, setLogs] = useState('');
   const [status, setStatus] = useState(null);
   const [deployerStatus, setDeployerStatus] = useState(null);
+  const [seoStatus, setSeoStatus] = useState(null);
   const [triggering, setTriggering] = useState(false);
   const [triggerMsg, setTriggerMsg] = useState('');
   const [copiedSlug, setCopiedSlug] = useState(null);
   const [previewSubdomain, setPreviewSubdomain] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchData = () => {
     fetch('/api/apps')
@@ -55,6 +60,11 @@ export default function Dashboard() {
       .then(res => res.success && setDeployerStatus(res.data))
       .catch(() => setDeployerStatus(null));
 
+    fetch('/api/seo')
+      .then(res => res.json())
+      .then(res => res.success && setSeoStatus(res.seo))
+      .catch(() => setSeoStatus(null));
+
     fetch('/api/logs')
       .then(res => res.text())
       .then(data => setLogs(data))
@@ -71,6 +81,70 @@ export default function Dashboard() {
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const triggerPipeline = async (dryRun = false) => {
+    setTriggering(true);
+    setTriggerMsg('');
+    try {
+      const res = await fetch('/api/pipeline/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dryRun })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTriggerMsg(`Cycle launched (${dryRun ? 'Dry-Run' : 'Live'}, PID: ${data.pid || 'queued'}).`);
+      } else {
+        setTriggerMsg(`Failed: ${data.error}`);
+      }
+    } catch (err) {
+      setTriggerMsg(`Error: ${err.message}`);
+    } finally {
+      setTriggering(false);
+      setTimeout(fetchData, 1000);
+    }
+  };
+
+  const triggerTestWebhook = async () => {
+    setTriggering(true);
+    setTriggerMsg('');
+    try {
+      const res = await fetch('/api/pipeline/webhook-test', {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTriggerMsg(`Webhook test alert dispatched (${data.result.method || 'mock'} mode).`);
+      } else {
+        setTriggerMsg(`Webhook alert failed: ${data.error}`);
+      }
+    } catch (err) {
+      setTriggerMsg(`Error: ${err.message}`);
+    } finally {
+      setTriggering(false);
+      setTimeout(fetchData, 1000);
+    }
+  };
+
+  const copyIframe = (subdomain, slug) => {
+    const snippet = `<iframe src="https://${subdomain}" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>`;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(snippet);
+    }
+    setCopiedSlug(slug || subdomain);
+    setTimeout(() => setCopiedSlug(null), 3000);
+  };
+
+  const filteredRoutes = routes.filter(r =>
+    !searchQuery ||
+    r.slug?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.subdomain?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredApps = apps.filter(a =>
+    !searchQuery ||
+    a.app_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <TooltipProvider>
@@ -102,7 +176,7 @@ export default function Dashboard() {
         </Card>
 
           {/* Quick Trigger Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -139,6 +213,23 @@ export default function Dashboard() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  onClick={triggerTestWebhook}
+                  disabled={triggering}
+                  variant="outline"
+                  className="border-slate-700 bg-slate-900 hover:bg-slate-800 text-purple-300 flex items-center gap-1.5"
+                >
+                  <BellRing className="h-4 w-4 text-purple-400" />
+                  Test Webhook
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Dispatch a test alert to the configured Discord or Slack webhook channel.</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
                   onClick={fetchData}
                   variant="ghost"
                   size="icon"
@@ -161,8 +252,28 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Global Filter Bar */}
+        <div className="flex items-center gap-3 bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+          <Search className="h-4 w-4 text-slate-400 ml-2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search deployed utilities or backlog by name or slug..."
+            className="bg-transparent border-0 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none w-full"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
         {/* High-Value Metric Counters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <Card className="bg-slate-900 border-slate-800 text-slate-100 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="flex items-center gap-1.5">
@@ -199,6 +310,26 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold text-white">{apps.length}</div>
               <p className="text-xs text-slate-400 mt-1">Feasible micro-tools analyzed</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900 border-slate-800 text-slate-100 shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                SEO & Sitemap
+              </CardTitle>
+              <Compass className="h-4 w-4 text-cyan-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline justify-between">
+                <div className="text-2xl font-bold text-cyan-400">{seoStatus?.urlCount ?? routes.length}</div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">
+                  Sitemap OK
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">
+                {seoStatus?.indexingMode || 'Mock Ping'}
+              </p>
             </CardContent>
           </Card>
 
@@ -315,7 +446,7 @@ export default function Dashboard() {
                 </Tooltip>
               </div>
               <span className="text-xs font-mono text-slate-400 bg-slate-800/60 px-2 py-1 rounded">
-                {routes.length} Active Routes
+                {filteredRoutes.length} of {routes.length} Active Routes
               </span>
             </div>
             <CardDescription className="text-slate-400">
@@ -333,14 +464,14 @@ export default function Dashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {routes.length === 0 ? (
+                {filteredRoutes.length === 0 ? (
                   <TableRow className="border-slate-800 hover:bg-transparent">
                     <TableCell colSpan={4} className="text-center text-slate-500 py-10">
-                      No active subdomain deployments found. Trigger a factory cycle to generate new micro-utilities.
+                      No matching subdomain deployments found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  routes.map(route => (
+                  filteredRoutes.map(route => (
                     <TableRow key={route.id} className="border-slate-800/60 hover:bg-slate-800/40">
                       <TableCell className="font-mono text-sm text-slate-300 font-medium">
                         {route.slug}
@@ -443,7 +574,7 @@ export default function Dashboard() {
                 </Tooltip>
               </div>
               <span className="text-xs font-mono text-slate-400 bg-slate-800/60 px-2 py-1 rounded">
-                {apps.length} Ingested
+                {filteredApps.length} of {apps.length} Ingested
               </span>
             </div>
             <CardDescription className="text-slate-400">
@@ -460,14 +591,14 @@ export default function Dashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apps.length === 0 ? (
+                {filteredApps.length === 0 ? (
                   <TableRow className="border-slate-800 hover:bg-transparent">
                     <TableCell colSpan={3} className="text-center text-slate-500 py-8">
-                      No applications currently ingested.
+                      No matching applications found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  apps.map(app => (
+                  filteredApps.map(app => (
                     <TableRow key={app.id} className="border-slate-800/60 hover:bg-slate-800/40">
                       <TableCell className="font-mono text-xs text-slate-400">{app.id}</TableCell>
                       <TableCell className="font-medium text-slate-200">{app.app_name}</TableCell>

@@ -1,7 +1,27 @@
 # CHANGELOG
 
+## [4.3.0] - 2026-11-08
+### Added
+- Consolidated and reorganized development and operational scripts in root `package.json` with `build:dashboard`, `start:dashboard`, `lint:dashboard`, and `clean:logs`.
+- Updated `start-container.sh` to use the unified `npm run start:dashboard` centralized script.
+- Hardened dashboard logs API (`/api/logs`) with line bounding, query parameter support (`?lines=N` up to 2000 lines), and empty file fallback handling.
+- Added test coverage in `tests/dashboard-api.test.js` and registered in `vitest.config.js`.
+- Bumping version to 4.3.0 across all documentation files and manifests.
+
+## [4.2.0] - 2026-11-08
+### Added
+- Phase 5 Programmatic SEO Operations: Full automated sitemap XML updating with duplicate entry deduplication, dynamic robots.txt generation, Google Search Console site verification meta generator, and batch URL indexing API trigger (`src/seo/index.js`).
+- Next.js SEO Monitoring Endpoint (`/api/seo`): Exposes indexed URL statistics, credentials verification, and sitemap counts to the dashboard.
+- Real-Time Webhook Alerting Pipeline (`src/notifications.js`): Discord and Slack alert integrations with automatic mock fallback; integrated directly into daemon scheduler events (`src/scheduler.js`).
+- Interactive Webhook Test Endpoint (`/api/pipeline/webhook-test`): Supports manual trigger of test alert dispatches from the dashboard UI.
+- Unified Single-Page Dashboard Refinements: Added dedicated SEO & Sitemap metrics card, real-time live search filter bar across deployed subdomains and discovered backlog, and live test alert controls.
+- Comprehensive Test Coverage Expansion: Added `tests/seo.test.js` and `tests/notifications.test.js` bringing test suite to 14 Vitest suites and 29 unit/integration tests with 100% pass rate.
+
 ## [4.1.0] - 2026-11-05
 ### Added
+- Factory Webhook Notifications (`src/notifications.js`): Discord and Slack alert dispatches for spec generation warnings, self-healing loop failures, deployment successes, and fatal pipeline exceptions.
+- Programmatic SEO Operations (Phase 5): Added Google Search Console site verification meta generator, dynamic robots.txt generator, sitemap URL extraction, batch indexing triggers, and dashboard SEO status endpoint (`/api/seo`).
+- Automated CI/CD GitHub Actions Workflow: Added `.github/workflows/ci.yml` orchestrating automated dependencies installation, Vitest unit/integration testing (13 suites, 24 tests), Next.js dashboard build, factory dry-run smoke testing, and server tray health verification.
 - Interactive Widget Sandbox Preview: Added instant sandboxed iframe preview directly inside the dashboard Active Subdomain Deployments table with DOM/CSS isolation.
 - Performance Optimization: Parallelized discovery scraper execution in `src/discovery/index.js` using `Promise.allSettled`, reducing multi-source scraping cycle latency by ~43%.
 - Multi-Tenant Vercel Deployment Inspection: added `verifyProjectDomain` and `getDeploymentStatus` to `src/deployer/vercel.js`.

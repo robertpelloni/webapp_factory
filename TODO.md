@@ -14,4 +14,12 @@
 - [x] Parallelize multi-source discovery scrapers using `Promise.allSettled`.
 - [x] Enhance multi-tenant Vercel deployer with domain verification and deployment status inspection.
 - [x] Add interactive live sandbox preview drawer to dashboard table for instant widget testing.
-- [ ] Add webhook notification alerts (Discord/Slack) for factory generation failures.
+- [x] Set up CI/CD pipeline workflow (`.github/workflows/ci.yml`) with automated testing, build verification, and pipeline smoke tests.
+- [x] Complete Programmatic SEO Operations (Phase 5): Google Search Console site verification, dynamic robots.txt, batch indexing queue, and `/api/seo` dashboard endpoint.
+- [x] Add webhook notification alerts (Discord/Slack) for factory generation failures and deployment events (`src/notifications.js`).
+- [x] Expand dashboard UI with real-time text filter and interactive manual webhook trigger actions.
+- [x] Consolidate and reorganize operational build and runtime scripts in root `package.json` (`build:dashboard`, `start:dashboard`, `clean:logs`).
+- [x] Harden dashboard log inspection endpoint (`/api/logs`) with lines parameter query bounding and empty fallback states.
+- [x] Add automated test coverage in `tests/dashboard-api.test.js` validating log bounding and fallback behaviors.
+- [ ] Connect production Google Search Console service account JSON (`gcp-service-account.json`) for live automated API indexing.
+- [ ] Add real-time WebSocket / SSE log streaming to dashboard for sub-second log updates.
